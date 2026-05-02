@@ -1,0 +1,1879 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Projet IRIS — SNT × Français — Seconde</title>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;0,700;1,300;1,400;1,600&family=Syne:wght@400;500;700;800&family=DM+Mono:wght@300;400&display=swap" rel="stylesheet">
+<style>
+:root {
+  --noir:       #080810;
+  --encre:      #12121f;
+  --surface:    #1a1a2e;
+  --iris:       #5b2d8e;
+  --iris-vif:   #8b5cf6;
+  --iris-pale:  #c4b5fd;
+  --iris-brume: rgba(91,45,142,0.18);
+  --or:         #d4a853;
+  --or-pale:    #f5e6c8;
+  --rouge:      #c0424a;
+  --vert:       #2e7d52;
+  --texte:      #e8e4f0;
+  --texte-dim:  rgba(232,228,240,0.55);
+  --trait:      rgba(139,92,246,0.18);
+}
+
+*, *::before, *::after { margin:0; padding:0; box-sizing:border-box; }
+
+html { scroll-behavior: smooth; }
+
+body {
+  background: var(--noir);
+  color: var(--texte);
+  font-family: 'Syne', sans-serif;
+  font-weight: 400;
+  overflow-x: hidden;
+}
+
+/* ══════════════════════════════════
+   HERO — plein écran poétique
+══════════════════════════════════ */
+.hero {
+  min-height: 100vh;
+  display: grid;
+  place-items: center;
+  position: relative;
+  overflow: hidden;
+  background: var(--noir);
+}
+
+/* Cercles d'iris animés */
+.iris-orbits {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  pointer-events: none;
+}
+.orbit {
+  position: absolute;
+  border-radius: 50%;
+  border: 1px solid;
+  animation: pulse 8s ease-in-out infinite;
+}
+.orbit:nth-child(1){ width:640px;height:640px;border-color:rgba(91,45,142,0.10);animation-delay:0s; }
+.orbit:nth-child(2){ width:480px;height:480px;border-color:rgba(91,45,142,0.16);animation-delay:1.2s; }
+.orbit:nth-child(3){ width:340px;height:340px;border-color:rgba(139,92,246,0.22);animation-delay:2.4s; }
+.orbit:nth-child(4){ width:220px;height:220px;border-color:rgba(139,92,246,0.30);animation-delay:3.6s; }
+.orbit:nth-child(5){
+  width:200px;height:200px;
+  border-color:rgba(196,181,253,0.50);
+  animation-delay:4.8s;
+  overflow:hidden;
+  background:transparent;
+}
+.orbit:nth-child(5) .iris-photo {
+  width:100%;height:100%;
+  object-fit:cover;
+  border-radius:50%;
+  display:block;
+  opacity:0.92;
+  filter:brightness(1.05) contrast(1.08) saturate(1.1);
+  animation:photo-pulse 8s ease-in-out infinite;
+  animation-delay:4.8s;
+}
+@keyframes photo-pulse {
+  0%,100%{ transform:scale(1);   filter:brightness(1.05) contrast(1.08) saturate(1.1); }
+  50%    { transform:scale(1.06);filter:brightness(1.12) contrast(1.12) saturate(1.2); }
+}
+
+@keyframes pulse {
+  0%,100%{ transform:scale(1); opacity:0.8; }
+  50%{ transform:scale(1.04); opacity:1; }
+}
+
+/* Grain de texture */
+.hero::after {
+  content:'';
+  position:absolute;inset:0;
+  background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.04'/%3E%3C/svg%3E");
+  opacity:0.4;
+  pointer-events:none;
+}
+
+.hero-content {
+  position:relative;z-index:2;
+  text-align:center;
+  padding:2rem;
+  max-width:860px;
+}
+
+.hero-eyebrow {
+  font-family:'DM Mono', monospace;
+  font-size:0.68rem;
+  letter-spacing:0.3em;
+  text-transform:uppercase;
+  color:var(--iris-pale);
+  opacity:0.7;
+  margin-bottom:2.5rem;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  gap:1.2rem;
+}
+.hero-eyebrow::before,.hero-eyebrow::after {
+  content:'';flex:1;max-width:60px;
+  height:1px;background:var(--trait);
+}
+
+.hero-title {
+  font-family:'Cormorant Garamond', serif;
+  font-size:clamp(5rem,14vw,11rem);
+  font-weight:300;
+  line-height:0.88;
+  letter-spacing:-0.02em;
+  color:var(--texte);
+  margin-bottom:0.5rem;
+}
+.hero-title em {
+  font-style:italic;
+  color:var(--iris-vif);
+}
+
+.hero-subtitle {
+  font-family:'Cormorant Garamond', serif;
+  font-size:clamp(1rem,2.5vw,1.5rem);
+  font-weight:300;
+  font-style:italic;
+  color:var(--texte-dim);
+  margin:1.5rem 0 3rem;
+  line-height:1.6;
+}
+
+.hero-collab {
+  display:inline-flex;
+  align-items:center;
+  gap:0.8rem;
+  padding:0.6rem 1.6rem;
+  border:1px solid var(--trait);
+  border-radius:3rem;
+  font-family:'DM Mono',monospace;
+  font-size:0.72rem;
+  letter-spacing:0.12em;
+  text-transform:uppercase;
+  color:var(--iris-pale);
+}
+.collab-dot {
+  width:6px;height:6px;
+  border-radius:50%;
+  background:var(--or);
+  animation:blink 2s ease-in-out infinite;
+}
+@keyframes blink{ 0%,100%{opacity:1}50%{opacity:0.3} }
+
+/* ══════════════════════════════════
+   NAV latérale
+══════════════════════════════════ */
+.side-nav {
+  position:fixed;
+  right:2rem;top:50%;
+  transform:translateY(-50%);
+  z-index:100;
+  display:flex;
+  flex-direction:column;
+  gap:0.6rem;
+}
+.nav-dot {
+  width:8px;height:8px;
+  border-radius:50%;
+  border:1px solid rgba(139,92,246,0.5);
+  cursor:pointer;
+  transition:all 0.3s;
+  text-decoration:none;
+}
+.nav-dot:hover,.nav-dot.active {
+  background:var(--iris-vif);
+  border-color:var(--iris-vif);
+}
+@media(max-width:768px){ .side-nav{display:none;} }
+
+/* ══════════════════════════════════
+   LAYOUT PRINCIPAL
+══════════════════════════════════ */
+main { max-width:1080px; margin:0 auto; padding:0 2.5rem 8rem; }
+
+section { padding:5rem 0; border-top:1px solid var(--trait); }
+
+.s-label {
+  font-family:'DM Mono',monospace;
+  font-size:0.63rem;
+  letter-spacing:0.28em;
+  text-transform:uppercase;
+  color:var(--iris-vif);
+  margin-bottom:1rem;
+  opacity:0.8;
+}
+
+.s-title {
+  font-family:'Cormorant Garamond',serif;
+  font-size:clamp(2rem,5vw,3.4rem);
+  font-weight:600;
+  line-height:1.1;
+  margin-bottom:1.8rem;
+  color:var(--texte);
+}
+.s-title em { font-style:italic; color:var(--iris-vif); }
+
+/* ══════════════════════════════════
+   SECTION 0 — INTENTIONS DU PROJET
+══════════════════════════════════ */
+.intentions-grid {
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:1px;
+  background:var(--trait);
+  border:1px solid var(--trait);
+  border-radius:16px;
+  overflow:hidden;
+}
+@media(max-width:640px){ .intentions-grid{grid-template-columns:1fr;} }
+
+.intention-card {
+  background:var(--encre);
+  padding:2.5rem 2rem;
+  position:relative;
+}
+.intention-card::before {
+  content:'';
+  position:absolute;top:0;left:0;right:0;
+  height:3px;
+  background:var(--accent, var(--iris-vif));
+}
+.intention-card.snt { --accent:#8b5cf6; }
+.intention-card.fr  { --accent:#d4a853; }
+.intention-card.rgpd{ --accent:#c0424a; }
+.intention-card.expo{ --accent:#2e7d52; }
+
+.ic-tag {
+  font-family:'DM Mono',monospace;
+  font-size:0.63rem;
+  letter-spacing:0.2em;
+  text-transform:uppercase;
+  margin-bottom:1rem;
+}
+.snt .ic-tag { color:#8b5cf6; }
+.fr .ic-tag  { color:#d4a853; }
+.rgpd .ic-tag{ color:#c0424a; }
+.expo .ic-tag { color:#2e7d52; }
+
+.ic-title {
+  font-family:'Cormorant Garamond',serif;
+  font-size:1.4rem;
+  font-weight:600;
+  margin-bottom:0.8rem;
+  color:var(--texte);
+}
+
+.ic-body {
+  font-size:0.85rem;
+  color:var(--texte-dim);
+  line-height:1.75;
+}
+
+/* ══════════════════════════════════
+   GALERIE DÉMO — 5 filtres
+══════════════════════════════════ */
+.demo-intro {
+  font-family:'Cormorant Garamond',serif;
+  font-style:italic;
+  font-size:1.1rem;
+  color:var(--texte-dim);
+  margin-bottom:3rem;
+  max-width:640px;
+  line-height:1.7;
+}
+
+.demo-strip {
+  display:grid;
+  grid-template-columns:repeat(5,1fr);
+  gap:1rem;
+  margin-bottom:1rem;
+}
+@media(max-width:900px){ .demo-strip{grid-template-columns:repeat(3,1fr);} }
+@media(max-width:560px){ .demo-strip{grid-template-columns:repeat(2,1fr);} }
+
+.demo-card {
+  position:relative;
+  border-radius:12px;
+  overflow:hidden;
+  border:1px solid var(--trait);
+  background:var(--surface);
+  transition:transform 0.35s cubic-bezier(.16,1,.3,1), border-color 0.3s;
+  cursor:pointer;
+}
+.demo-card:hover {
+  transform:translateY(-6px);
+  border-color:rgba(139,92,246,0.5);
+}
+
+/* Zone photo — slot à remplir */
+.demo-photo-slot {
+  aspect-ratio:1/1;
+  width:100%;
+  background: var(--surface);
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  justify-content:center;
+  gap:0.6rem;
+  position:relative;
+  overflow:hidden;
+}
+
+/* Fond décoratif propre à chaque filtre */
+.demo-card[data-filtre="original"] .demo-photo-slot {
+  background:radial-gradient(circle at 50% 50%, #2a1a3e 0%, #0d0a15 70%);
+}
+.demo-card[data-filtre="gris"] .demo-photo-slot {
+  background:radial-gradient(circle at 50% 50%, #2a2a2a 0%, #0a0a0a 70%);
+}
+.demo-card[data-filtre="negatif"] .demo-photo-slot {
+  background:radial-gradient(circle at 50% 50%, #1a2a1a 0%, #050d05 70%);
+}
+.demo-card[data-filtre="cosmique"] .demo-photo-slot {
+  background:radial-gradient(circle at 50% 50%, #3a1a0a 0%, #0d0508 70%);
+}
+.demo-card[data-filtre="libre"] .demo-photo-slot {
+  background:radial-gradient(circle at 50% 50%, #0a1a2a 0%, #03060d 70%);
+}
+
+/* Cercles décoratifs dans chaque slot */
+.slot-ring {
+  position:absolute;
+  border-radius:50%;
+  border:1px solid;
+  opacity:0.25;
+}
+.slot-ring.r1{ width:80%;height:80%;border-color:currentColor; }
+.slot-ring.r2{ width:55%;height:55%;border-color:currentColor; }
+.slot-ring.r3{ width:30%;height:30%;border-color:currentColor; }
+
+.demo-card[data-filtre="original"] .slot-ring { color:#8b5cf6; }
+.demo-card[data-filtre="gris"]     .slot-ring { color:#888; }
+.demo-card[data-filtre="negatif"]  .slot-ring { color:#5cf66a; }
+.demo-card[data-filtre="cosmique"] .slot-ring { color:#d4a853; }
+.demo-card[data-filtre="libre"]    .slot-ring { color:#60a5fa; }
+
+/* Vraie photo embarquée — masquée par défaut, visible si src définie */
+.demo-img {
+  position:absolute;
+  inset:0;
+  width:100%;height:100%;
+  object-fit:cover;
+  border-radius:0;
+  display:none; /* devient block quand src est renseignée */
+  opacity:0;
+  transition:opacity 0.5s;
+}
+.demo-img.loaded { display:block; opacity:1; }
+
+/* Placeholder texte */
+.slot-placeholder {
+  font-family:'DM Mono',monospace;
+  font-size:0.6rem;
+  letter-spacing:0.15em;
+  text-transform:uppercase;
+  text-align:center;
+  line-height:1.8;
+  padding:0 0.5rem;
+  pointer-events:none;
+  z-index:1;
+}
+.demo-card[data-filtre="original"] .slot-placeholder { color:rgba(139,92,246,0.5); }
+.demo-card[data-filtre="gris"]     .slot-placeholder { color:rgba(150,150,150,0.5); }
+.demo-card[data-filtre="negatif"]  .slot-placeholder { color:rgba(92,246,106,0.5); }
+.demo-card[data-filtre="cosmique"] .slot-placeholder { color:rgba(212,168,83,0.5); }
+.demo-card[data-filtre="libre"]    .slot-placeholder { color:rgba(96,165,250,0.5); }
+
+/* Numéro du filtre */
+.slot-num {
+  position:absolute;
+  top:0.6rem;left:0.6rem;
+  font-family:'DM Mono',monospace;
+  font-size:0.55rem;
+  letter-spacing:0.1em;
+  z-index:2;
+  opacity:0.4;
+}
+
+.demo-cartel {
+  padding:0.9rem 0.8rem 1rem;
+}
+.demo-cartel-name {
+  font-family:'Cormorant Garamond',serif;
+  font-size:1rem;
+  font-weight:600;
+  color:var(--texte);
+  margin-bottom:0.2rem;
+}
+.demo-cartel-desc {
+  font-size:0.72rem;
+  color:var(--texte-dim);
+  font-family:'DM Mono',monospace;
+  line-height:1.5;
+}
+
+.demo-note {
+  margin-top:1.5rem;
+  padding:1rem 1.5rem;
+  background:rgba(212,168,83,0.06);
+  border-left:2px solid rgba(212,168,83,0.35);
+  border-radius:0 8px 8px 0;
+  font-size:0.82rem;
+  color:var(--texte-dim);
+  font-family:'DM Mono',monospace;
+  line-height:1.6;
+}
+.demo-note strong { color:var(--or); }
+
+/* ══════════════════════════════════
+   SÉANCES — timeline verticale
+══════════════════════════════════ */
+.timeline {
+  position:relative;
+  padding-left:3rem;
+}
+.timeline::before {
+  content:'';
+  position:absolute;
+  left:0.65rem;top:0;bottom:0;
+  width:1px;
+  background:linear-gradient(to bottom, transparent, var(--iris-vif) 10%, var(--iris-vif) 90%, transparent);
+  opacity:0.3;
+}
+
+.tl-item {
+  position:relative;
+  margin-bottom:2.5rem;
+}
+.tl-item:last-child { margin-bottom:0; }
+
+/* Point sur la timeline */
+.tl-dot {
+  position:absolute;
+  left:-2.5rem;
+  top:1.2rem;
+  width:14px;height:14px;
+  border-radius:50%;
+  border:2px solid var(--dot-color, var(--iris-vif));
+  background:var(--noir);
+  display:flex;align-items:center;justify-content:center;
+}
+.tl-dot::after {
+  content:'';
+  width:5px;height:5px;
+  border-radius:50%;
+  background:var(--dot-color, var(--iris-vif));
+}
+
+/* Couleurs par discipline */
+.tl-item.snt   { --dot-color:#8b5cf6; }
+.tl-item.fr    { --dot-color:#d4a853; }
+.tl-item.mixte { --dot-color:#60a5fa; }
+.tl-item.expo  { --dot-color:#2e7d52; }
+
+.tl-card {
+  background:var(--encre);
+  border:1px solid var(--trait);
+  border-radius:14px;
+  padding:1.8rem 2rem;
+  transition:border-color 0.3s;
+}
+.tl-card:hover { border-color:rgba(139,92,246,0.35); }
+
+.tl-header {
+  display:flex;
+  align-items:flex-start;
+  gap:1rem;
+  margin-bottom:1.2rem;
+  flex-wrap:wrap;
+}
+
+.tl-badge {
+  font-family:'DM Mono',monospace;
+  font-size:0.63rem;
+  letter-spacing:0.15em;
+  text-transform:uppercase;
+  padding:0.25rem 0.8rem;
+  border-radius:2rem;
+  flex-shrink:0;
+}
+.tl-item.snt   .tl-badge { background:rgba(139,92,246,0.15);color:#8b5cf6; }
+.tl-item.fr    .tl-badge { background:rgba(212,168,83,0.12);color:#d4a853; }
+.tl-item.mixte .tl-badge { background:rgba(96,165,250,0.12);color:#60a5fa; }
+.tl-item.expo  .tl-badge { background:rgba(46,125,82,0.12);color:#4ade80; }
+
+.tl-discipline {
+  font-family:'DM Mono',monospace;
+  font-size:0.6rem;
+  letter-spacing:0.12em;
+  text-transform:uppercase;
+  padding:0.25rem 0.8rem;
+  border-radius:2rem;
+  margin-left:auto;
+}
+.tl-item.snt   .tl-discipline { background:rgba(139,92,246,0.07);color:rgba(139,92,246,0.6); }
+.tl-item.fr    .tl-discipline { background:rgba(212,168,83,0.07);color:rgba(212,168,83,0.6); }
+.tl-item.mixte .tl-discipline { background:rgba(96,165,250,0.07);color:rgba(96,165,250,0.6); }
+.tl-item.expo  .tl-discipline { background:rgba(46,125,82,0.07);color:rgba(46,125,82,0.6); }
+
+.tl-title {
+  font-family:'Cormorant Garamond',serif;
+  font-size:1.3rem;
+  font-weight:600;
+  color:var(--texte);
+  line-height:1.2;
+}
+
+.tl-body {
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:1.5rem;
+}
+@media(max-width:640px){ .tl-body{grid-template-columns:1fr;} }
+
+.tl-col h4 {
+  font-family:'DM Mono',monospace;
+  font-size:0.6rem;
+  letter-spacing:0.2em;
+  text-transform:uppercase;
+  color:var(--iris-pale);
+  opacity:0.6;
+  margin-bottom:0.6rem;
+}
+
+.tl-col ul { list-style:none; }
+.tl-col ul li {
+  font-size:0.84rem;
+  color:var(--texte-dim);
+  padding:0.22rem 0 0.22rem 1rem;
+  position:relative;
+  line-height:1.5;
+}
+.tl-col ul li::before {
+  content:'›';
+  position:absolute;left:0;
+  color:var(--dot-color,var(--iris-vif));
+  font-size:0.9rem;
+  line-height:1.3;
+}
+
+.tl-col.full { grid-column:1/-1; }
+
+/* Bloc citation / texte littéraire */
+.quote-block {
+  margin-top:1rem;
+  padding:1.2rem 1.5rem;
+  border-left:2px solid rgba(212,168,83,0.4);
+  background:rgba(212,168,83,0.04);
+  border-radius:0 8px 8px 0;
+}
+.quote-block p {
+  font-family:'Cormorant Garamond',serif;
+  font-size:1rem;
+  font-style:italic;
+  color:rgba(232,228,240,0.7);
+  line-height:1.7;
+  margin-bottom:0.3rem;
+}
+.quote-block cite {
+  font-family:'DM Mono',monospace;
+  font-size:0.62rem;
+  letter-spacing:0.1em;
+  text-transform:uppercase;
+  color:rgba(212,168,83,0.6);
+}
+
+/* Code snippet dans timeline */
+.tl-code {
+  margin-top:1rem;
+  background:#0a0a14;
+  border:1px solid rgba(139,92,246,0.2);
+  border-radius:10px;
+  padding:1.2rem 1.4rem;
+  overflow-x:auto;
+}
+.tl-code pre { margin:0; }
+.tl-code code {
+  font-family:'DM Mono',monospace;
+  font-size:0.76rem;
+  line-height:1.75;
+  color:#c4b5fd;
+  white-space:pre;
+  display:block;
+}
+.ck { color:#8b5cf6; }
+.cf { color:#d4a853; }
+.cs { color:#86efac; }
+.cc { color:#3a3a5a; font-style:italic; }
+.cn { color:#f87171; }
+
+/* ══════════════════════════════════
+   TEXTES LITTÉRAIRES — bibliothèque
+══════════════════════════════════ */
+.textes-grid {
+  display:grid;
+  grid-template-columns:repeat(auto-fit,minmax(280px,1fr));
+  gap:1.2rem;
+}
+
+.texte-card {
+  background:var(--encre);
+  border:1px solid var(--trait);
+  border-radius:12px;
+  padding:1.8rem 1.5rem;
+  position:relative;
+  overflow:hidden;
+}
+.texte-card::after {
+  content:'"';
+  position:absolute;
+  bottom:-1rem;right:0.5rem;
+  font-family:'Cormorant Garamond',serif;
+  font-size:8rem;
+  color:rgba(139,92,246,0.05);
+  line-height:1;
+  pointer-events:none;
+}
+
+.texte-auteur {
+  font-family:'DM Mono',monospace;
+  font-size:0.62rem;
+  letter-spacing:0.15em;
+  text-transform:uppercase;
+  color:var(--or);
+  margin-bottom:0.6rem;
+}
+.texte-titre {
+  font-family:'Cormorant Garamond',serif;
+  font-size:1.1rem;
+  font-weight:600;
+  color:var(--texte);
+  margin-bottom:0.8rem;
+}
+.texte-extrait {
+  font-family:'Cormorant Garamond',serif;
+  font-style:italic;
+  font-size:0.95rem;
+  color:var(--texte-dim);
+  line-height:1.75;
+  margin-bottom:1rem;
+}
+.texte-usage {
+  font-size:0.78rem;
+  color:rgba(139,92,246,0.7);
+  font-family:'DM Mono',monospace;
+  line-height:1.5;
+}
+
+/* ══════════════════════════════════
+   CONFIANCE EN SOI — activités
+══════════════════════════════════ */
+.confiance-grid {
+  display:grid;
+  grid-template-columns:repeat(auto-fit,minmax(300px,1fr));
+  gap:1.2rem;
+}
+
+.confiance-card {
+  background:var(--encre);
+  border:1px solid rgba(212,168,83,0.2);
+  border-radius:14px;
+  padding:2rem 1.8rem;
+}
+
+.cc-num {
+  font-family:'Cormorant Garamond',serif;
+  font-size:3rem;
+  font-weight:300;
+  color:rgba(212,168,83,0.2);
+  line-height:1;
+  margin-bottom:0.5rem;
+}
+.cc-title {
+  font-family:'Cormorant Garamond',serif;
+  font-size:1.2rem;
+  font-weight:600;
+  color:var(--or-pale);
+  margin-bottom:0.8rem;
+}
+.cc-body {
+  font-size:0.84rem;
+  color:var(--texte-dim);
+  line-height:1.7;
+}
+.cc-body strong { color:var(--or); }
+
+/* ══════════════════════════════════
+   ÉTHIQUE & RGPD
+══════════════════════════════════ */
+.ethique-grid {
+  display:grid;
+  grid-template-columns:repeat(auto-fit,minmax(260px,1fr));
+  gap:1rem;
+}
+
+.eth-card {
+  border-radius:12px;
+  padding:1.5rem;
+  border:1px solid transparent;
+}
+.eth-card.rouge { background:rgba(192,66,74,0.07);border-color:rgba(192,66,74,0.2); }
+.eth-card.ambre { background:rgba(212,168,83,0.07);border-color:rgba(212,168,83,0.2); }
+.eth-card.vert  { background:rgba(46,125,82,0.07);border-color:rgba(46,125,82,0.2); }
+.eth-card.bleu  { background:rgba(91,45,142,0.1);border-color:rgba(139,92,246,0.25); }
+
+.eth-card h3 {
+  font-family:'DM Mono',monospace;
+  font-size:0.65rem;
+  letter-spacing:0.18em;
+  text-transform:uppercase;
+  margin-bottom:0.7rem;
+}
+.eth-card.rouge h3 { color:#f87171; }
+.eth-card.ambre h3 { color:#d4a853; }
+.eth-card.vert  h3 { color:#4ade80; }
+.eth-card.bleu  h3 { color:var(--iris-pale); }
+
+.eth-card p {
+  font-size:0.84rem;
+  color:var(--texte-dim);
+  line-height:1.68;
+}
+
+/* ══════════════════════════════════
+   EXPOSITION
+══════════════════════════════════ */
+.expo-grid {
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:1.5rem;
+}
+@media(max-width:640px){ .expo-grid{grid-template-columns:1fr;} }
+
+.expo-card {
+  background:var(--encre);
+  border:1px solid var(--trait);
+  border-radius:14px;
+  padding:2rem;
+}
+.expo-card h3 {
+  font-family:'Cormorant Garamond',serif;
+  font-size:1.3rem;
+  font-weight:600;
+  color:var(--texte);
+  margin-bottom:1.2rem;
+  padding-bottom:0.8rem;
+  border-bottom:1px solid var(--trait);
+}
+.expo-card ul { list-style:none; }
+.expo-card ul li {
+  font-size:0.84rem;
+  color:var(--texte-dim);
+  padding:0.4rem 0 0.4rem 1.2rem;
+  position:relative;
+  border-bottom:1px solid rgba(139,92,246,0.06);
+  line-height:1.5;
+}
+.expo-card ul li:last-child { border-bottom:none; }
+.expo-card ul li::before {
+  content:'◆';
+  position:absolute;left:0;
+  color:var(--iris-vif);
+  font-size:0.45rem;
+  top:0.65rem;
+}
+
+/* ══════════════════════════════════
+   ÉVALUATION
+══════════════════════════════════ */
+.eval-table {
+  width:100%;
+  border-collapse:collapse;
+  font-size:0.84rem;
+}
+.eval-table thead th {
+  font-family:'DM Mono',monospace;
+  font-size:0.62rem;
+  letter-spacing:0.18em;
+  text-transform:uppercase;
+  color:var(--iris-pale);
+  text-align:left;
+  padding:0.9rem 1rem;
+  border-bottom:1px solid rgba(139,92,246,0.25);
+  opacity:0.7;
+}
+.eval-table tbody td {
+  padding:0.85rem 1rem;
+  color:var(--texte-dim);
+  border-bottom:1px solid rgba(139,92,246,0.08);
+  vertical-align:top;
+  line-height:1.5;
+}
+.eval-table tbody tr:hover td { background:rgba(139,92,246,0.04); }
+.pts {
+  font-family:'DM Mono',monospace;
+  font-size:0.9rem;
+  color:var(--or);
+  white-space:nowrap;
+}
+.disc-snt  { color:#8b5cf6; font-family:'DM Mono',monospace; font-size:0.7rem; }
+.disc-fr   { color:#d4a853; font-family:'DM Mono',monospace; font-size:0.7rem; }
+.disc-comm { color:#60a5fa; font-family:'DM Mono',monospace; font-size:0.7rem; }
+
+/* ══════════════════════════════════
+   UTILITAIRES
+══════════════════════════════════ */
+.note {
+  margin:1.2rem 0;
+  padding:1rem 1.5rem;
+  background:rgba(212,168,83,0.05);
+  border-left:2px solid rgba(212,168,83,0.3);
+  border-radius:0 8px 8px 0;
+  font-size:0.83rem;
+  color:var(--texte-dim);
+  line-height:1.65;
+}
+.note strong { color:var(--or); }
+
+.alerte {
+  margin:1.2rem 0;
+  padding:1rem 1.5rem;
+  background:rgba(192,66,74,0.06);
+  border-left:2px solid rgba(192,66,74,0.3);
+  border-radius:0 8px 8px 0;
+  font-size:0.83rem;
+  color:var(--texte-dim);
+  line-height:1.65;
+}
+.alerte strong { color:#f87171; }
+
+/* ══════════════════════════════════
+   FOOTER
+══════════════════════════════════ */
+footer {
+  border-top:1px solid var(--trait);
+  padding:3rem 2.5rem;
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  flex-wrap:wrap;
+  gap:1rem;
+  max-width:1080px;
+  margin:0 auto;
+}
+.footer-left {
+  font-family:'Cormorant Garamond',serif;
+  font-size:1.2rem;
+  font-style:italic;
+  color:var(--texte-dim);
+}
+.footer-right {
+  font-family:'DM Mono',monospace;
+  font-size:0.63rem;
+  letter-spacing:0.15em;
+  text-transform:uppercase;
+  color:rgba(139,92,246,0.5);
+  text-align:right;
+  line-height:1.8;
+}
+</style>
+</head>
+<body>
+
+<!-- NAV latérale -->
+<nav class="side-nav" aria-label="Navigation">
+  <a class="nav-dot" href="#intentions" title="Intentions"></a>
+  <a class="nav-dot" href="#demo" title="Démonstration"></a>
+  <a class="nav-dot" href="#seances" title="Séances"></a>
+  <a class="nav-dot" href="#textes" title="Textes"></a>
+  <a class="nav-dot" href="#confiance" title="Confiance en soi"></a>
+  <a class="nav-dot" href="#ethique" title="Éthique"></a>
+  <a class="nav-dot" href="#exposition" title="Exposition"></a>
+  <a class="nav-dot" href="#evaluation" title="Évaluation"></a>
+</nav>
+
+<!-- ══════════ HERO ══════════ -->
+<header class="hero">
+  <div class="iris-orbits">
+    <div class="orbit"></div>
+    <div class="orbit"></div>
+    <div class="orbit"></div>
+    <div class="orbit"></div>
+    <div class="orbit">
+      <!-- Remplacer mon_iris.jpg par le nom exact de votre fichier photo -->
+      <img class="iris-photo" src="nathalie_iris_bd.png" alt="Iris">
+    </div>
+  </div>
+  <div class="hero-content">
+    <p class="hero-eyebrow">
+      <span></span>
+      Projet interdisciplinaire — SNT × Français — Seconde
+      <span></span>
+    </p>
+    <h1 class="hero-title">Se voir<br><em>autrement</em></h1>
+    <p class="hero-subtitle">
+      Photographie numérique, traitement d'image par Python<br>
+      et écriture de soi — vers une exposition collective sur le regard.
+    </p>
+    <div class="hero-collab">
+      <span class="collab-dot"></span>
+      SNT &nbsp;·&nbsp; Français &nbsp;·&nbsp; 8 séances &nbsp;·&nbsp; Seconde
+    </div>
+  </div>
+</header>
+
+<main>
+
+<!-- ══════════ INTENTIONS ══════════ -->
+<section id="intentions">
+  <p class="s-label">00 — Intentions du projet</p>
+  <h2 class="s-title">Deux disciplines,<br>un même regard</h2>
+
+  <div class="intentions-grid">
+    <div class="intention-card snt">
+      <p class="ic-tag">SNT — Numérique</p>
+      <h3 class="ic-title">La technique du regard</h3>
+      <p class="ic-body">
+        Comprendre qu'une image n'est qu'une grille de nombres. Apprendre à lire,
+        modifier et analyser ces nombres avec Python. Mesurer ce que la machine
+        "voit" là où l'œil humain perçoit de la beauté ou de l'identité.
+      </p>
+    </div>
+    <div class="intention-card fr">
+      <p class="ic-tag">Français — Expression</p>
+      <h3 class="ic-title">La puissance du regard</h3>
+      <p class="ic-body">
+        Écrire sur soi à partir d'une image de soi. Travailler la confiance en
+        soi par le détour de l'intime — l'iris, fragment du visage invisible
+        au quotidien, révélateur d'une présence unique au monde.
+      </p>
+    </div>
+    <div class="intention-card rgpd">
+      <p class="ic-tag">Transversal — Éthique</p>
+      <h3 class="ic-title">Les enjeux du regard</h3>
+      <p class="ic-body">
+        Comprendre que cet iris est une donnée biométrique protégée par le RGPD.
+        Questionner la surveillance, le consentement, ce qu'on accepte de montrer
+        de soi et pourquoi — en ligne comme dans l'espace public.
+      </p>
+    </div>
+    <div class="intention-card expo">
+      <p class="ic-tag">Finalité — Exposition</p>
+      <h3 class="ic-title">Partager son regard</h3>
+      <p class="ic-body">
+        Aboutir à une exposition double — physique dans le lycée et galerie web —
+        mêlant les iris traités par Python et les textes rédigés en français.
+        Chaque élève, auteur et artiste de sa propre image.
+      </p>
+    </div>
+  </div>
+
+  <div class="alerte" style="margin-top:1.5rem;">
+    <strong>Préalable obligatoire :</strong> recueillir les autorisations parentales avant la séance 1. Préciser explicitement que les photos d'iris constituent des <em>données biométriques</em> au sens de l'Art. 9 du RGPD. Prévoir des iris libres de droits pour les élèves non-consentants.
+  </div>
+</section>
+
+<!-- ══════════ GALERIE DÉMO ══════════ -->
+<section id="demo">
+  <p class="s-label">01 — Démonstration enseignant</p>
+  <h2 class="s-title">Un iris,<br><em>cinq regards</em></h2>
+
+  <p class="demo-intro">
+    Cinq traitements Python appliqués au même iris — de l'original brut au filtre
+    entièrement conçu par l'élève. Cette galerie sert de démonstration en classe
+    pour montrer ce que le projet produira. l'iris exemple est celle de la femme de l'enseignant de NSI, Nathalie — un grand merci à elle pour sa contribution artistique et son courage à exposer son regard au monde ! Réalisation depuis une photo prise avec un honor magic V5 en mode macro, puis recadrée à l'aide de Gemini. Les cinq images sont disponibles dans le dépôt GitHub du projet, prêtes à être utilisées comme modèles ou comme iris libres de droits.
+  </p>
+
+  <div class="demo-strip">
+
+    <!-- 1 — Original -->
+    <div class="demo-card" data-filtre="original">
+      <div class="demo-photo-slot">
+        <span class="slot-num">01</span>
+        <div class="slot-ring r1"></div>
+        <div class="slot-ring r2"></div>
+        <div class="slot-ring r3"></div>
+        <!-- ↓ Remplacer src="" par le chemin de votre photo originale -->
+        <img class="demo-img" src="nathalie_iris.png" alt="Iris original" id="photo-original"
+             onload="this.classList.add('loaded')">
+        <p class="slot-placeholder">
+          Placer ici<br>la photo<br>originale
+        </p>
+      </div>
+      <div class="demo-cartel">
+        <p class="demo-cartel-name">Original</p>
+        <p class="demo-cartel-desc">Photo brute, nettoyée des métadonnées EXIF — telle que capturée</p>
+      </div>
+    </div>
+
+    <!-- 2 — Niveaux de gris -->
+    <div class="demo-card" data-filtre="gris">
+      <div class="demo-photo-slot">
+        <span class="slot-num">02</span>
+        <div class="slot-ring r1"></div>
+        <div class="slot-ring r2"></div>
+        <div class="slot-ring r3"></div>
+        <!-- ↓ Remplacer src="" par le chemin de votre photo gris -->
+        <img class="demo-img" src="nathalie_iris_gris.png" alt="Iris niveaux de gris" id="photo-gris"
+             onload="this.classList.add('loaded')">
+        <p class="slot-placeholder">
+          Placer ici<br>la photo<br>niveaux de gris
+        </p>
+      </div>
+      <div class="demo-cartel">
+        <p class="demo-cartel-name">Niveaux de gris</p>
+        <p class="demo-cartel-desc">L = 0.299·R + 0.587·V + 0.114·B appliqué pixel par pixel</p>
+      </div>
+    </div>
+
+    <!-- 3 — Négatif -->
+    <div class="demo-card" data-filtre="negatif">
+      <div class="demo-photo-slot">
+        <span class="slot-num">03</span>
+        <div class="slot-ring r1"></div>
+        <div class="slot-ring r2"></div>
+        <div class="slot-ring r3"></div>
+        <!-- ↓ Remplacer src="" par le chemin de votre photo négatif -->
+        <img class="demo-img" src="nathalie_iris_negatif.png" alt="Iris négatif" id="photo-negatif"
+             onload="this.classList.add('loaded')">
+        <p class="slot-placeholder">
+          Placer ici<br>la photo<br>négatif
+        </p>
+      </div>
+      <div class="demo-cartel">
+        <p class="demo-cartel-name">Négatif</p>
+        <p class="demo-cartel-desc">Chaque canal inversé : (255-R, 255-V, 255-B) — l'invisible révélé</p>
+      </div>
+    </div>
+
+    <!-- 4 — Cosmique -->
+    <div class="demo-card" data-filtre="cosmique">
+      <div class="demo-photo-slot">
+        <span class="slot-num">04</span>
+        <div class="slot-ring r1"></div>
+        <div class="slot-ring r2"></div>
+        <div class="slot-ring r3"></div>
+        <!-- ↓ Remplacer src="" par le chemin de votre photo cosmique -->
+        <img class="demo-img" src="nathalie_iris_cosmique.png" alt="Iris filtre cosmique" id="photo-cosmique"
+             onload="this.classList.add('loaded')">
+        <p class="slot-placeholder">
+          Placer ici<br>la photo<br>filtre cosmique
+        </p>
+      </div>
+      <div class="demo-cartel">
+        <p class="demo-cartel-name">Filtre cosmique</p>
+        <p class="demo-cartel-desc">Palette violet→ambre mappée sur la luminosité — une nébuleuse dans l'œil</p>
+      </div>
+    </div>
+
+    <!-- 5 — Filtre libre -->
+    <div class="demo-card" data-filtre="libre">
+      <div class="demo-photo-slot">
+        <span class="slot-num">05</span>
+        <div class="slot-ring r1"></div>
+        <div class="slot-ring r2"></div>
+        <div class="slot-ring r3"></div>
+        <!-- ↓ Remplacer src="" par le chemin de votre photo filtre libre -->
+        <img class="demo-img" src="nathalie_iris_bd.png" alt="Iris filtre libre" id="photo-libre"
+             onload="this.classList.add('loaded')">
+        <p class="slot-placeholder">
+          Placer ici<br>votre filtre<br>personnel
+        </p>
+      </div>
+      <div class="demo-cartel">
+        <p class="demo-cartel-name">Filtre personnel</p>
+        <p class="demo-cartel-desc">Filtre inventé librement — l'élève choisit sa transformation</p>
+      </div>
+    </div>
+
+  </div>
+
+
+</section>
+
+<!-- ══════════ SÉANCES ══════════ -->
+<section id="seances">
+  <p class="s-label">02 — Progression pédagogique</p>
+  <h2 class="s-title">8 séances,<br><em>deux voix</em></h2>
+
+  <div class="timeline">
+
+    <!-- S1 SNT -->
+    <div class="tl-item snt">
+      <div class="tl-dot"></div>
+      <div class="tl-card">
+        <div class="tl-header">
+          <span class="tl-badge">Séance 1</span>
+          <div class="tl-title">L'oeil numérique — Qu'est-ce qu'une image ?</div>
+          <span class="tl-discipline">SNT</span>
+        </div>
+        <div class="tl-body">
+          <div class="tl-col">
+            <h4>Activités</h4>
+            <ul>
+              <li>Prise de photo de l'iris (smartphone + mode macro)</li>
+              <li>Zoom extrême : observation des pixels dans GIMP ou Paint</li>
+              <li>Relevé des valeurs RVB d'un pixel choisi</li>
+              <li>Comparaison formats JPEG vs PNG, poids du fichier</li>
+            </ul>
+          </div>
+          <div class="tl-col">
+            <h4>Notions clés</h4>
+            <ul>
+              <li>Pixel, résolution, dimension</li>
+              <li>Codage couleur RVB (triplet 0-255)</li>
+              <li>Compression et métadonnées EXIF</li>
+              <li>Poids = largeur x hauteur x 3 octets (non compressé)</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- S2 FRANÇAIS -->
+    <div class="tl-item fr">
+      <div class="tl-dot"></div>
+      <div class="tl-card">
+        <div class="tl-header">
+          <span class="tl-badge">Séance 2</span>
+          <div class="tl-title">Écriture de soi — Se regarder pour la première fois</div>
+          <span class="tl-discipline">Français</span>
+        </div>
+        <div class="tl-body">
+          <div class="tl-col">
+            <h4>Activités</h4>
+            <ul>
+              <li>Chaque élève observe sa photo d'iris imprimée en grand format</li>
+              <li>Exercice d'écriture libre : "Ce que je vois dans cet oeil que je ne savais pas"</li>
+              <li>Lecture à haute voix volontaire — écoute bienveillante du groupe</li>
+              <li>Introduction aux textes du corpus littéraire</li>
+            </ul>
+          </div>
+          <div class="tl-col">
+            <h4>Objectifs confiance en soi</h4>
+            <ul>
+              <li>Prendre la parole sur quelque chose d'intime sans être jugé</li>
+              <li>Valoriser sa singularité : aucun iris ne ressemble à un autre</li>
+              <li>Construire une image positive de soi par l'écriture</li>
+              <li>Apprendre à recevoir et formuler un retour positif</li>
+            </ul>
+          </div>
+          <div class="tl-col full">
+            <div class="quote-block">
+              <p>« Vos yeux sont si profonds qu'en me penchant pour boire<br>
+              j'ai vu tous les soleils y venir se mirer. »</p>
+              <cite>Louis Aragon — Les Yeux d'Elsa (1942)</cite>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- S3 SNT -->
+    <div class="tl-item snt">
+      <div class="tl-dot"></div>
+      <div class="tl-card">
+        <div class="tl-header">
+          <span class="tl-badge">Séance 3</span>
+          <div class="tl-title">Python & Pillow — Lire une image comme une machine</div>
+          <span class="tl-discipline">SNT</span>
+        </div>
+        <div class="tl-body">
+          <div class="tl-col">
+            <h4>Activités</h4>
+            <ul>
+              <li>Ouverture de l'iris avec Pillow — <code style="color:#c4b5fd">Image.open().convert("RGB")</code></li>
+              <li>Lecture d'un pixel avec <code style="color:#c4b5fd">getpixel()</code></li>
+              <li>Double boucle sur les pixels, compteur de pixels "chauds"</li>
+              <li>Exercice : trouver les coordonnées du pixel le plus lumineux</li>
+            </ul>
+          </div>
+          <div class="tl-col">
+            <h4>Notions clés</h4>
+            <ul>
+              <li>Import de bibliothèque, objet Image</li>
+              <li>Tuples, déstructuration (r, g, b)</li>
+              <li>Double boucle for imbriquée</li>
+              <li><code style="color:#c4b5fd">.convert("RGB")</code> — gestion du canal alpha (PNG)</li>
+            </ul>
+          </div>
+          <div class="tl-col full">
+            <div class="tl-code"><pre><code><span class="ck">from</span> PIL <span class="ck">import</span> Image
+
+<span class="cc"># Toujours convertir en RGB pour eviter l'erreur "too many values"</span>
+img = Image.<span class="cf">open</span>(<span class="cs">"mon_iris.png"</span>).<span class="cf">convert</span>(<span class="cs">"RGB"</span>)
+largeur, hauteur = img.size
+<span class="cf">print</span>(<span class="cs">f"Dimensions : {largeur} x {hauteur} pixels"</span>)
+
+<span class="cc"># Lire le pixel central</span>
+cx, cy = largeur // <span class="cn">2</span>, hauteur // <span class="cn">2</span>
+r, g, b = img.<span class="cf">getpixel</span>((cx, cy))
+<span class="cf">print</span>(<span class="cs">f"Pixel central : R={r}, V={g}, B={b}"</span>)
+
+<span class="cc"># Trouver le pixel le plus lumineux</span>
+max_L, pos = <span class="cn">0</span>, (<span class="cn">0</span>, <span class="cn">0</span>)
+<span class="ck">for</span> x <span class="ck">in</span> <span class="cf">range</span>(largeur):
+    <span class="ck">for</span> y <span class="ck">in</span> <span class="cf">range</span>(hauteur):
+        r, g, b = img.<span class="cf">getpixel</span>((x, y))
+        L = <span class="cf">int</span>(<span class="cn">0.299</span>*r + <span class="cn">0.587</span>*g + <span class="cn">0.114</span>*b)
+        <span class="ck">if</span> L > max_L:
+            max_L, pos = L, (x, y)
+<span class="cf">print</span>(<span class="cs">f"Pixel le plus lumineux : {pos}, L={max_L}"</span>)
+</code></pre></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- S4 SNT -->
+    <div class="tl-item snt">
+      <div class="tl-dot"></div>
+      <div class="tl-card">
+        <div class="tl-header">
+          <span class="tl-badge">Séance 4</span>
+          <div class="tl-title">Transformer l'iris — Filtres & effets artistiques</div>
+          <span class="tl-discipline">SNT</span>
+        </div>
+        <div class="tl-body">
+          <div class="tl-col">
+            <h4>Activités</h4>
+            <ul>
+              <li>Niveaux de gris : formule de luminance</li>
+              <li>Négatif : inversion des canaux</li>
+              <li>Filtre cosmique : mapping sur palette violet-ambre</li>
+              <li>Défi créatif : inventer son propre filtre pour l'expo</li>
+            </ul>
+          </div>
+          <div class="tl-col">
+            <h4>Notions clés</h4>
+            <ul>
+              <li><code style="color:#c4b5fd">putpixel()</code> pour modifier pixel par pixel</li>
+              <li>Fonctions Python : def, paramètres, return</li>
+              <li>Interpolation linéaire entre deux couleurs</li>
+              <li>Sauvegarde : <code style="color:#c4b5fd">.save()</code></li>
+            </ul>
+          </div>
+          <div class="tl-col full">
+            <div class="tl-code"><pre><code><span class="ck">from</span> PIL <span class="ck">import</span> Image
+
+<span class="ck">def</span> <span class="cf">niveaux_de_gris</span>(img):
+    <span class="cs">"""Convertit une image en niveaux de gris."""</span>
+    resultat = Image.<span class="cf">new</span>(<span class="cs">"RGB"</span>, img.size)
+    <span class="ck">for</span> x <span class="ck">in</span> <span class="cf">range</span>(img.size[<span class="cn">0</span>]):
+        <span class="ck">for</span> y <span class="ck">in</span> <span class="cf">range</span>(img.size[<span class="cn">1</span>]):
+            r, g, b = img.<span class="cf">getpixel</span>((x, y))
+            L = <span class="cf">int</span>(<span class="cn">0.299</span>*r + <span class="cn">0.587</span>*g + <span class="cn">0.114</span>*b)
+            resultat.<span class="cf">putpixel</span>((x, y), (L, L, L))
+    <span class="ck">return</span> resultat
+
+<span class="ck">def</span> <span class="cf">negatif</span>(img):
+    <span class="cs">"""Inverse les couleurs de l'image."""</span>
+    resultat = Image.<span class="cf">new</span>(<span class="cs">"RGB"</span>, img.size)
+    <span class="ck">for</span> x <span class="ck">in</span> <span class="cf">range</span>(img.size[<span class="cn">0</span>]):
+        <span class="ck">for</span> y <span class="ck">in</span> <span class="cf">range</span>(img.size[<span class="cn">1</span>]):
+            r, g, b = img.<span class="cf">getpixel</span>((x, y))
+            resultat.<span class="cf">putpixel</span>((x, y), (<span class="cn">255</span>-r, <span class="cn">255</span>-g, <span class="cn">255</span>-b))
+    <span class="ck">return</span> resultat
+
+<span class="ck">def</span> <span class="cf">filtre_cosmique</span>(img):
+    <span class="cs">"""Mappe la luminosite sur une palette violet-ambre."""</span>
+    resultat = Image.<span class="cf">new</span>(<span class="cs">"RGB"</span>, img.size)
+    <span class="ck">for</span> x <span class="ck">in</span> <span class="cf">range</span>(img.size[<span class="cn">0</span>]):
+        <span class="ck">for</span> y <span class="ck">in</span> <span class="cf">range</span>(img.size[<span class="cn">1</span>]):
+            r, g, b = img.<span class="cf">getpixel</span>((x, y))
+            L = <span class="cf">int</span>(<span class="cn">0.299</span>*r + <span class="cn">0.587</span>*g + <span class="cn">0.114</span>*b)
+            t = L / <span class="cn">255</span>
+            nr = <span class="cf">int</span>(<span class="cn">74</span> + t*(<span class="cn">232</span>-<span class="cn">74</span>))
+            ng = <span class="cf">int</span>(<span class="cn">45</span> + t*(<span class="cn">160</span>-<span class="cn">45</span>))
+            nb_val = <span class="cf">int</span>(<span class="cn">130</span> * (<span class="cn">1</span>-t))
+            resultat.<span class="cf">putpixel</span>((x, y), (nr, ng, nb_val))
+    <span class="ck">return</span> resultat
+
+<span class="cc"># Application et sauvegarde</span>
+img = Image.<span class="cf">open</span>(<span class="cs">"mon_iris.png"</span>).<span class="cf">convert</span>(<span class="cs">"RGB"</span>)
+<span class="cf">niveaux_de_gris</span>(img).<span class="cf">save</span>(<span class="cs">"iris_gris.png"</span>)
+<span class="cf">negatif</span>(img).<span class="cf">save</span>(<span class="cs">"iris_negatif.png"</span>)
+<span class="cf">filtre_cosmique</span>(img).<span class="cf">save</span>(<span class="cs">"iris_cosmique.png"</span>)
+</code></pre></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- S5 MIXTE -->
+    <div class="tl-item mixte">
+      <div class="tl-dot"></div>
+      <div class="tl-card">
+        <div class="tl-header">
+          <span class="tl-badge">Séance 5</span>
+          <div class="tl-title">RGPD, biométrie & écriture réflexive</div>
+          <span class="tl-discipline">SNT + Français</span>
+        </div>
+        <div class="tl-body">
+          <div class="tl-col">
+            <h4>Volet SNT — Données & EXIF</h4>
+            <ul>
+              <li>Lecture et suppression des métadonnées EXIF avec Python</li>
+              <li>Analyse des CGU Instagram / TikTok (extraits simplifiés)</li>
+              <li>Débat : peut-on partager son iris sur les réseaux ?</li>
+              <li>Rédaction collective d'une charte éthique de l'exposition</li>
+            </ul>
+          </div>
+          <div class="tl-col">
+            <h4>Volet Français — Confiance & identité</h4>
+            <ul>
+              <li>Lecture d'extraits littéraires sur le regard et l'identité</li>
+              <li>Exercice : rédiger le "cartel de soi" — 5 lignes pour l'expo</li>
+              <li>Travail sur la reformulation positive</li>
+              <li>Partage en binôme — retour bienveillant du partenaire</li>
+            </ul>
+          </div>
+          <div class="tl-col full">
+            <div class="tl-code"><pre><code><span class="ck">from</span> PIL <span class="ck">import</span> Image
+<span class="ck">from</span> PIL.ExifTags <span class="ck">import</span> TAGS
+<span class="ck">import</span> io
+
+<span class="ck">def</span> <span class="cf">lire_exif</span>(chemin):
+    <span class="cs">"""Affiche toutes les metadonnees EXIF d'une image."""</span>
+    img = Image.<span class="cf">open</span>(chemin)
+    exif_data = img._getexif()
+    <span class="ck">if not</span> exif_data:
+        <span class="cf">print</span>(<span class="cs">"Aucune metadonnee EXIF trouvee."</span>)
+        <span class="ck">return</span>
+    <span class="ck">for</span> tag_id, valeur <span class="ck">in</span> exif_data.<span class="cf">items</span>():
+        tag = TAGS.<span class="cf">get</span>(tag_id, tag_id)
+        <span class="cf">print</span>(<span class="cs">f"  {tag:25s} : {valeur}"</span>)
+
+<span class="ck">def</span> <span class="cf">supprimer_exif</span>(chemin_entree, chemin_sortie):
+    <span class="cs">"""Cree une copie de l'image sans aucune metadonnee."""</span>
+    img = Image.<span class="cf">open</span>(chemin_entree).<span class="cf">convert</span>(<span class="cs">"RGB"</span>)
+    buffer = io.<span class="cf">BytesIO</span>()
+    img_propre = Image.<span class="cf">new</span>(img.mode, img.size)
+    img_propre.<span class="cf">putdata</span>(<span class="cf">list</span>(img.<span class="cf">getdata</span>()))
+    img_propre.<span class="cf">save</span>(buffer, format=<span class="cs">"JPEG"</span>, quality=<span class="cn">95</span>)
+    <span class="ck">with</span> <span class="cf">open</span>(chemin_sortie, <span class="cs">"wb"</span>) <span class="ck">as</span> f:
+        f.<span class="cf">write</span>(buffer.<span class="cf">getvalue</span>())
+    <span class="cf">print</span>(<span class="cs">f"Image nettoyee sauvegardee : {chemin_sortie}"</span>)
+
+<span class="cc"># Utilisation</span>
+<span class="cf">lire_exif</span>(<span class="cs">"mon_iris.jpg"</span>)
+<span class="cf">supprimer_exif</span>(<span class="cs">"mon_iris.jpg"</span>, <span class="cs">"iris_sans_exif.jpg"</span>)
+</code></pre></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- S6 SNT -->
+    <div class="tl-item snt">
+      <div class="tl-dot"></div>
+      <div class="tl-card">
+        <div class="tl-header">
+          <span class="tl-badge">Séance 6</span>
+          <div class="tl-title">Analyse & Statistiques — La couleur de mon regard</div>
+          <span class="tl-discipline">SNT</span>
+        </div>
+        <div class="tl-body">
+          <div class="tl-col">
+            <h4>Activités</h4>
+            <ul>
+              <li>Calcul des moyennes RVB de l'iris entier</li>
+              <li>Histogramme de luminosité avec matplotlib</li>
+              <li>Algorithme de détection de la couleur dominante</li>
+              <li>Génération d'une "empreinte chromatique" de l'iris</li>
+            </ul>
+          </div>
+          <div class="tl-col">
+            <h4>Notions clés</h4>
+            <ul>
+              <li>Moyenne, distribution, fréquence</li>
+              <li>Listes et accumulation</li>
+              <li>Classification par seuils</li>
+              <li>Représentation graphique (matplotlib)</li>
+            </ul>
+          </div>
+          <div class="tl-col full">
+            <div class="tl-code"><pre><code><span class="ck">from</span> PIL <span class="ck">import</span> Image
+<span class="ck">import</span> matplotlib.pyplot <span class="ck">as</span> plt
+
+<span class="ck">def</span> <span class="cf">analyser_iris</span>(chemin):
+    img = Image.<span class="cf">open</span>(chemin).<span class="cf">convert</span>(<span class="cs">"RGB"</span>)
+    pixels = <span class="cf">list</span>(img.<span class="cf">getdata</span>())
+
+    <span class="cc"># Moyennes RVB</span>
+    moy_r = <span class="cf">sum</span>(p[<span class="cn">0</span>] <span class="ck">for</span> p <span class="ck">in</span> pixels) / <span class="cf">len</span>(pixels)
+    moy_g = <span class="cf">sum</span>(p[<span class="cn">1</span>] <span class="ck">for</span> p <span class="ck">in</span> pixels) / <span class="cf">len</span>(pixels)
+    moy_b = <span class="cf">sum</span>(p[<span class="cn">2</span>] <span class="ck">for</span> p <span class="ck">in</span> pixels) / <span class="cf">len</span>(pixels)
+
+    <span class="cc"># Histogramme des luminosites</span>
+    histo = [<span class="cn">0</span>] * <span class="cn">256</span>
+    <span class="ck">for</span> p <span class="ck">in</span> pixels:
+        L = <span class="cf">int</span>(<span class="cn">0.299</span>*p[<span class="cn">0</span>] + <span class="cn">0.587</span>*p[<span class="cn">1</span>] + <span class="cn">0.114</span>*p[<span class="cn">2</span>])
+        histo[L] += <span class="cn">1</span>
+
+    <span class="cc"># Couleur dominante</span>
+    <span class="ck">if</span> moy_b > moy_r <span class="ck">and</span> moy_b > moy_g:
+        couleur = <span class="cs">"bleu"</span>
+    <span class="ck">elif</span> moy_g > moy_r:
+        couleur = <span class="cs">"vert"</span>
+    <span class="ck">elif</span> moy_r > <span class="cn">120</span>:
+        couleur = <span class="cs">"marron / noisette"</span>
+    <span class="ck">else</span>:
+        couleur = <span class="cs">"sombre"</span>
+
+    <span class="cf">print</span>(<span class="cs">f"Couleur dominante : {couleur}"</span>)
+    <span class="cf">print</span>(<span class="cs">f"Moyenne RVB : ({moy_r:.1f}, {moy_g:.1f}, {moy_b:.1f})"</span>)
+
+    <span class="cc"># Affichage de l'histogramme</span>
+    plt.<span class="cf">figure</span>(figsize=(<span class="cn">10</span>, <span class="cn">4</span>))
+    plt.<span class="cf">bar</span>(<span class="cf">range</span>(<span class="cn">256</span>), histo, color=<span class="cs">"#7b52c4"</span>, alpha=<span class="cn">0.8</span>, width=<span class="cn">1</span>)
+    plt.<span class="cf">title</span>(<span class="cs">f"Distribution des luminosites — iris {couleur}"</span>)
+    plt.<span class="cf">xlabel</span>(<span class="cs">"Luminosite (0=noir, 255=blanc)"</span>)
+    plt.<span class="cf">ylabel</span>(<span class="cs">"Nombre de pixels"</span>)
+    plt.<span class="cf">savefig</span>(<span class="cs">"histogramme_iris.png"</span>, dpi=<span class="cn">150</span>)
+    plt.<span class="cf">show</span>()
+
+<span class="cf">analyser_iris</span>(<span class="cs">"mon_iris.png"</span>)
+</code></pre></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- S7 FRANÇAIS -->
+    <div class="tl-item fr">
+      <div class="tl-dot"></div>
+      <div class="tl-card">
+        <div class="tl-header">
+          <span class="tl-badge">Séance 7</span>
+          <div class="tl-title">Texte final — "Ce que mon iris ne dit pas"</div>
+          <span class="tl-discipline">Français</span>
+        </div>
+        <div class="tl-body">
+          <div class="tl-col">
+            <h4>Activités</h4>
+            <ul>
+              <li>Rédaction du texte final d'exposition (15-20 lignes)</li>
+              <li>Mise en forme soignée : titre choisi par l'élève</li>
+              <li>Relecture croisée en binôme — corrections bienveillantes</li>
+              <li>Sélection du filtre Python qui accompagnera le texte</li>
+            </ul>
+          </div>
+          <div class="tl-col">
+            <h4>Objectifs confiance en soi</h4>
+            <ul>
+              <li>Oser affirmer une vision de soi positive et singulière</li>
+              <li>Choisir ce qu'on montre — exercice de l'autonomie</li>
+              <li>Ressentir la fierté d'un travail abouti</li>
+              <li>Prendre conscience que ses mots ont de la valeur</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- S8 EXPO -->
+    <div class="tl-item expo">
+      <div class="tl-dot"></div>
+      <div class="tl-card">
+        <div class="tl-header">
+          <span class="tl-badge">Séance 8</span>
+          <div class="tl-title">Vernissage — L'exposition prend vie</div>
+          <span class="tl-discipline">SNT + Français</span>
+        </div>
+        <div class="tl-body">
+          <div class="tl-col">
+            <h4>Production numérique (SNT)</h4>
+            <ul>
+              <li>Génération de la galerie web par script Python</li>
+              <li>Mise en ligne sur réseau interne lycée</li>
+              <li>Vérification : aucune métadonnée EXIF dans les fichiers publiés</li>
+            </ul>
+          </div>
+          <div class="tl-col">
+            <h4>Production physique (Français)</h4>
+            <ul>
+              <li>Impression A3 : iris traité + texte d'exposition</li>
+              <li>Cartels rédigés par chaque élève</li>
+              <li>Panneau collectif "Nos iris en chiffres"</li>
+              <li>Vernissage ouvert aux autres classes et familles</li>
+            </ul>
+          </div>
+          <div class="tl-col full">
+            <div class="tl-code"><pre><code><span class="ck">import</span> os, base64
+
+<span class="ck">def</span> <span class="cf">generer_galerie</span>(dossier_iris, fichier_sortie=<span class="cs">"galerie.html"</span>):
+    <span class="cs">"""Genere une galerie HTML a partir des images traitees."""</span>
+    iris_list = [f <span class="ck">for</span> f <span class="ck">in</span> os.<span class="cf">listdir</span>(dossier_iris) <span class="ck">if</span> f.<span class="cf">endswith</span>(<span class="cs">".png"</span>)]
+    cartes = <span class="cs">""</span>
+    <span class="ck">for</span> nom_fichier <span class="ck">in</span> iris_list:
+        chemin = os.path.<span class="cf">join</span>(dossier_iris, nom_fichier)
+        <span class="ck">with</span> <span class="cf">open</span>(chemin, <span class="cs">"rb"</span>) <span class="ck">as</span> f:
+            b64 = base64.<span class="cf">b64encode</span>(f.<span class="cf">read</span>()).<span class="cf">decode</span>()
+        prenom = nom_fichier.<span class="cf">replace</span>(<span class="cs">"_"</span>, <span class="cs">" "</span>).<span class="cf">replace</span>(<span class="cs">".png"</span>, <span class="cs">""</span>)
+        cartes += <span class="cs">f"""
+        &lt;div class="carte"&gt;
+          &lt;img src="data:image/png;base64,{b64}" alt="Iris de {prenom}"&gt;
+          &lt;div class="cartel"&gt;&lt;strong&gt;{prenom}&lt;/strong&gt;&lt;/div&gt;
+        &lt;/div&gt;"""</span>
+
+    html = <span class="cs">f"""&lt;!DOCTYPE html&gt;
+&lt;html lang="fr"&gt;&lt;head&gt;&lt;meta charset="UTF-8"&gt;
+&lt;title&gt;Exposition IRIS&lt;/title&gt;
+&lt;style&gt;body{{background:#0a0a0f;color:#f5f2ee;font-family:sans-serif;}}
+h1{{text-align:center;padding:2rem;font-size:3rem;}}
+.galerie{{display:flex;flex-wrap:wrap;gap:1rem;justify-content:center;padding:2rem;}}
+.carte{{width:220px;border:1px solid #4a2d82;border-radius:12px;overflow:hidden;}}
+.carte img{{width:100%;display:block;}}
+.cartel{{padding:0.8rem;text-align:center;background:#1a0a3a;}}&lt;/style&gt;
+&lt;/head&gt;&lt;body&gt;
+&lt;h1&gt;Exposition IRIS&lt;/h1&gt;
+&lt;div class="galerie"&gt;{cartes}&lt;/div&gt;
+&lt;/body&gt;&lt;/html&gt;"""</span>
+
+    <span class="ck">with</span> <span class="cf">open</span>(fichier_sortie, <span class="cs">"w"</span>, encoding=<span class="cs">"utf-8"</span>) <span class="ck">as</span> f:
+        f.<span class="cf">write</span>(html)
+    <span class="cf">print</span>(<span class="cs">f"Galerie generee : {fichier_sortie}"</span>)
+
+<span class="cf">generer_galerie</span>(<span class="cs">"iris_traites/"</span>)
+</code></pre></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</section>
+
+<!-- ══════════ TEXTES LITTÉRAIRES ══════════ -->
+<section id="textes">
+  <p class="s-label">03 — Corpus littéraire</p>
+  <h2 class="s-title">Des mots pour<br><em>voir autrement</em></h2>
+
+  <p style="font-family:'Cormorant Garamond',serif;font-style:italic;color:var(--texte-dim);margin-bottom:2rem;font-size:1.05rem;line-height:1.7;max-width:640px;">
+    Ces textes servent de points d'appui pour l'écriture de soi. L'enseignant·e de français choisit
+    un ou plusieurs extraits selon la progression souhaitée.
+  </p>
+
+  <div class="textes-grid">
+    <div class="texte-card">
+      <p class="texte-auteur">Louis Aragon — 1942</p>
+      <p class="texte-titre">Les Yeux d'Elsa</p>
+      <p class="texte-extrait">
+        « Vos yeux sont si profonds qu'en me penchant pour boire<br>
+        j'ai vu tous les soleils y venir se mirer. »
+      </p>
+      <p class="texte-usage">Usage → Point d'entrée sur la profondeur symbolique du regard. Déclencheur d'écriture : "Que voit-on quand on plonge dans son propre iris ?"</p>
+    </div>
+
+    <div class="texte-card">
+      <p class="texte-auteur">Rainer Maria Rilke — 1929</p>
+      <p class="texte-titre">Lettres à un jeune poète</p>
+      <p class="texte-extrait">
+        « Il n'est qu'une seule chose nécessaire : la solitude, la grande solitude intérieure.
+        Aller en soi-même et ne rencontrer pendant des heures personne — c'est à cela qu'il faut parvenir. »
+      </p>
+      <p class="texte-usage">Usage → Séance 2. Réflexion sur l'introspection. L'iris comme invitation à "aller en soi-même".</p>
+    </div>
+
+    <div class="texte-card">
+      <p class="texte-auteur">Annie Ernaux — 2022</p>
+      <p class="texte-titre">Les Années (extrait adapté)</p>
+      <p class="texte-extrait">
+        « Elle cherche dans le miroir ce qui dure, ce qui traverse les années,
+        quelque chose que les photos ne montrent pas et que le temps n'efface pas. »
+      </p>
+      <p class="texte-usage">Usage → Séance 7. Écriture du texte final. Lien entre image figée et identité en mouvement. Accessible et puissant pour les secondes.</p>
+    </div>
+
+    <div class="texte-card">
+      <p class="texte-auteur">Jean-Paul Sartre — 1943</p>
+      <p class="texte-titre">L'Être et le Néant (extrait simplifié)</p>
+      <p class="texte-extrait">
+        « Le regard d'autrui me révèle à moi-même. Je ne me vois jamais me voir.
+        C'est toujours l'autre qui me voit en premier. »
+      </p>
+      <p class="texte-usage">Usage → Débat séance 5. Lien avec la biométrie et la reconnaissance automatique : qui nous "voit" vraiment ?</p>
+    </div>
+
+    <div class="texte-card">
+      <p class="texte-auteur">Colette — 1900</p>
+      <p class="texte-titre">Claudine à l'école (extrait)</p>
+      <p class="texte-extrait">
+        « J'ai des yeux changeants, dit-on. Ils sont verts le matin, gris le soir,
+        et noirs quand je suis en colère. Moi je les trouve simplement honnêtes. »
+      </p>
+      <p class="texte-usage">Usage → Séance 2. Légèreté et humour. Décomplexe la parole sur soi. Idéal pour débuter l'écriture de soi avec les élèves intimidés.</p>
+    </div>
+
+    <div class="texte-card">
+      <p class="texte-auteur">Victor Hugo — 1835</p>
+      <p class="texte-titre">Les Contemplations — Regard</p>
+      <p class="texte-extrait">
+        « L'œil était dans la tombe et regardait Caïn. »
+      </p>
+      <p class="texte-usage">Usage → Séance 5 (volet RGPD). La métaphore du regard omniscient — pont entre littérature et surveillance numérique. Une seule ligne, un débat entier.</p>
+    </div>
+  </div>
+</section>
+
+<!-- ══════════ CONFIANCE EN SOI ══════════ -->
+<section id="confiance">
+  <p class="s-label">04 — Volet français & développement personnel</p>
+  <h2 class="s-title">Progresser,<br><em>s'affirmer</em></h2>
+
+  <p style="font-family:'Cormorant Garamond',serif;font-style:italic;color:var(--texte-dim);margin-bottom:2rem;font-size:1.05rem;line-height:1.7;max-width:640px;">
+    Le détour par la technique (photographier, traiter, analyser) libère la parole sur soi.
+    L'iris devient un tiers — ni miroir direct ni fiction — qui permet d'aborder l'identité
+    sans la frontalité anxiogène du "parle-moi de toi".
+  </p>
+
+  <div class="confiance-grid">
+    <div class="confiance-card">
+      <div class="cc-num">01</div>
+      <h3 class="cc-title">Le détour technique comme libération</h3>
+      <p class="cc-body">
+        Parler de son iris en termes de pixels, de valeurs RVB, de filtres Python — c'est parler
+        de soi <strong>sans le dire directement</strong>. Cette distance est précieuse pour les
+        élèves qui craignent l'exposition personnelle. La machine "dépersonnalise" assez pour
+        permettre ensuite la réappropriation par l'écriture.
+      </p>
+    </div>
+    <div class="confiance-card">
+      <div class="cc-num">02</div>
+      <h3 class="cc-title">La singularité prouvée par les données</h3>
+      <p class="cc-body">
+        Quand l'analyse Python révèle que chaque iris a une empreinte chromatique unique —
+        des moyennes RVB que personne d'autre dans la classe ne partage exactement —
+        <strong>la singularité de l'élève est prouvée mathématiquement</strong>.
+        Ce n'est plus une opinion, c'est un fait mesurable. Puissant pour la confiance en soi.
+      </p>
+    </div>
+    <div class="confiance-card">
+      <div class="cc-num">03</div>
+      <h3 class="cc-title">Choisir ce qu'on montre</h3>
+      <p class="cc-body">
+        Chaque élève choisit quel filtre Python accompagnera son texte à l'exposition.
+        Ce <strong>pouvoir de choix</strong> — décider de l'image qu'on donne de soi —
+        est un exercice concret d'autonomie et d'affirmation de soi, rare à cet âge
+        dans le cadre scolaire.
+      </p>
+    </div>
+    <div class="confiance-card">
+      <div class="cc-num">04</div>
+      <h3 class="cc-title">L'exposition comme accomplissement</h3>
+      <p class="cc-body">
+        Voir son travail affiché dans l'établissement, lu et regardé par d'autres,
+        produit un sentiment de <strong>fierté légitime</strong>. L'exposition physique
+        ancre l'accomplissement dans le réel — plus durable qu'une note sur une copie.
+        Le vernissage est un moment de reconnaissance sociale par les pairs et les adultes.
+      </p>
+    </div>
+    <div class="confiance-card">
+      <div class="cc-num">05</div>
+      <h3 class="cc-title">La relecture bienveillante</h3>
+      <p class="cc-body">
+        Les exercices de relecture croisée en binôme (séances 2 et 7) entraînent à
+        <strong>recevoir un regard positif sur son travail</strong> et à en formuler un
+        à son tour. Compétence sociale fondamentale, souvent peu développée à cet âge,
+        qui renforce la confiance mutuelle dans le groupe-classe.
+      </p>
+    </div>
+    <div class="confiance-card">
+      <div class="cc-num">06</div>
+      <h3 class="cc-title">Le titre comme acte d'auteur</h3>
+      <p class="cc-body">
+        Donner un titre à son texte d'exposition — et donc à l'ensemble de sa production —
+        est un <strong>acte d'auteur</strong>. L'élève ne produit plus un "devoir" mais une
+        œuvre. Cette bascule symbolique est l'un des effets les plus durables du projet
+        sur l'estime de soi scolaire.
+      </p>
+    </div>
+  </div>
+</section>
+
+<!-- ══════════ ÉTHIQUE ══════════ -->
+<section id="ethique">
+  <p class="s-label">05 — Repères éthiques & RGPD</p>
+  <h2 class="s-title">Ce qu'on montre,<br><em>ce qu'on protège</em></h2>
+
+  <div class="ethique-grid">
+    <div class="eth-card rouge">
+      <h3>Données biométriques</h3>
+      <p>L'iris est une donnée biométrique au sens de l'article 9 du RGPD. Son traitement est interdit par défaut sans consentement explicite et sans finalité documentée. Toute publication externe nécessite une procédure formelle.</p>
+    </div>
+    <div class="eth-card ambre">
+      <h3>EXIF & géolocalisation</h3>
+      <p>Une photo de smartphone contient souvent les coordonnées GPS du lieu de prise. Le script de suppression EXIF (séance 5) est obligatoire avant toute publication — même sur le réseau interne du lycée.</p>
+    </div>
+    <div class="eth-card vert">
+      <h3>Cadre du projet</h3>
+      <p>Consentement écrit, finalité pédagogique documentée, images conservées uniquement sur le réseau interne, droit de retrait à tout moment sans justification. Alternative avec iris libres de droits pour tout élève qui le souhaite.</p>
+    </div>
+    <div class="eth-card bleu">
+      <h3>Reconnaissance & biais algorithmiques</h3>
+      <p>Les systèmes de reconnaissance irienne ont des taux d'erreur variables selon l'éclairage et la morphologie. Aucun algorithme n'est neutre. La question de la responsabilité en cas d'erreur est un débat démocratique ouvert.</p>
+    </div>
+    <div class="eth-card rouge">
+      <h3>Réseaux sociaux</h3>
+      <p>Poster son iris sur Instagram transfère une licence d'utilisation à Meta. La plateforme peut utiliser cette image pour entraîner des algorithmes de reconnaissance. La charte éthique collective (séance 5) formalise cet engagement.</p>
+    </div>
+    <div class="eth-card ambre">
+      <h3>Surveillance de masse</h3>
+      <p>Plusieurs États ont déployé des systèmes de reconnaissance irienne dans les espaces publics. L'équilibre entre sécurité et vie privée est un débat démocratique que ce projet prépare les élèves à tenir de façon éclairée.</p>
+    </div>
+  </div>
+</section>
+
+<!-- ══════════ EXPOSITION ══════════ -->
+<section id="exposition">
+  <p class="s-label">06 — Finalité du projet</p>
+  <h2 class="s-title">L'exposition,<br><em>double forme</em></h2>
+
+  <div class="expo-grid">
+    <div class="expo-card">
+      <h3>Exposition physique</h3>
+      <ul>
+        <li>Tirage A3 : iris traité par Python + texte d'exposition rédigé en français</li>
+        <li>Cartel élève : prénom (ou pseudonyme), titre de l'œuvre, filtre utilisé, valeurs RVB moyennes</li>
+        <li>Panneau collectif "Nos iris en chiffres" — histogramme et stats de la classe</li>
+        <li>Panneau éthique — la charte rédigée collectivement séance 5</li>
+        <li>QR code renvoyant vers la galerie web</li>
+        <li>Affichage hall ou CDI — 2 semaines minimum — vernissage ouvert</li>
+      </ul>
+    </div>
+    <div class="expo-card">
+      <h3>Galerie numérique</h3>
+      <ul>
+        <li>Page HTML générée automatiquement par le script Python de la séance 8</li>
+        <li>Chaque iris → carte avec image traitée, texte d'exposition, cartel</li>
+        <li>Page "La couleur de notre classe" — camembert des couleurs d'iris détectées</li>
+        <li>Section "Le projet" — déroulé pédagogique et outils utilisés</li>
+        <li>Section "Notre charte éthique" — engagement collectif formalisé</li>
+        <li>Hébergement réseau interne lycée (recommandé) — aucune image EXIF publiée</li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="note" style="margin-top:1.5rem;">
+    <strong>Conseil :</strong> afficher explicitement à l'entrée de l'exposition que chaque iris a été transformé par un programme Python écrit par l'élève lui-même, et que chaque texte a été entièrement rédigé par l'élève. Ce double "fait par moi" est souvent ce qui surprend — et émeut — le plus les visiteurs.
+  </div>
+</section>
+
+<!-- ══════════ ÉVALUATION ══════════ -->
+<section id="evaluation">
+  <p class="s-label">07 — Évaluation</p>
+  <h2 class="s-title">Grille<br><em>sur 20 points</em></h2>
+
+  <table class="eval-table">
+    <thead>
+      <tr>
+        <th>Critère</th>
+        <th>Discipline</th>
+        <th>Descripteur</th>
+        <th>Points</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><strong>Compréhension pixel / RVB</strong></td>
+        <td><span class="disc-snt">SNT</span></td>
+        <td>Sait expliquer pixel, triplet RVB, résolution, poids d'une image</td>
+        <td class="pts">3 pts</td>
+      </tr>
+      <tr>
+        <td><strong>Script lecture & filtres</strong></td>
+        <td><span class="disc-snt">SNT</span></td>
+        <td>Programme fonctionnel avec au moins un filtre original structuré en fonctions</td>
+        <td class="pts">5 pts</td>
+      </tr>
+      <tr>
+        <td><strong>Analyse EXIF</strong></td>
+        <td><span class="disc-snt">SNT</span></td>
+        <td>Lecture et suppression des métadonnées, compréhension des enjeux de confidentialité</td>
+        <td class="pts">2 pts</td>
+      </tr>
+      <tr>
+        <td><strong>Texte d'exposition</strong></td>
+        <td><span class="disc-fr">Français</span></td>
+        <td>Texte personnel de 15–20 lignes, soigné, titré, qui dit quelque chose de singulier</td>
+        <td class="pts">4 pts</td>
+      </tr>
+      <tr>
+        <td><strong>Réflexion éthique</strong></td>
+        <td><span class="disc-comm">Transversal</span></td>
+        <td>Contribution argumentée à la charte, pertinence du débat séance 5</td>
+        <td class="pts">3 pts</td>
+      </tr>
+      <tr>
+        <td><strong>Production exposition</strong></td>
+        <td><span class="disc-comm">Transversal</span></td>
+        <td>Cohérence visuelle iris/texte, soin du cartel, engagement dans le vernissage</td>
+        <td class="pts">3 pts</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <div class="note" style="margin-top:1.5rem;">
+    <strong>Différenciation :</strong> pour les élèves avancés — défi bonus : détecter automatiquement la pupille (zone sombre centrale) et calculer son rayon en pixels. Pour les élèves en difficulté — fournir les boucles pré-écrites, laisser compléter uniquement les calculs RVB et le texte d'exposition.
+  </div>
+</section>
+
+</main>
+
+<footer>
+  <p class="footer-left">"Se voir autrement."</p>
+  <p class="footer-right">
+    Lycée Antoine Watteau — Valenciennes<br>
+    Projet IRIS — SNT × Français — Seconde<br>
+    DarkSATHI Li
+  </p>
+</footer>
+
+<script>
+// Navigation latérale — highlight au scroll
+const sections = document.querySelectorAll('section[id]');
+const dots = document.querySelectorAll('.nav-dot');
+
+const observer = new IntersectionObserver((entries) => {
+  entries.forEach(entry => {
+    if (entry.isIntersecting) {
+      const id = entry.target.getAttribute('id');
+      dots.forEach(d => {
+        d.classList.toggle('active', d.getAttribute('href') === '#' + id);
+      });
+    }
+  });
+}, { threshold: 0.4 });
+
+sections.forEach(s => observer.observe(s));
+
+// Gestion des photos démo : masquer le placeholder si l'image charge
+document.querySelectorAll('.demo-img').forEach(img => {
+  if (img.src && img.src !== window.location.href) {
+    img.style.display = 'block';
+    img.addEventListener('load', () => {
+      img.classList.add('loaded');
+      const placeholder = img.parentElement.querySelector('.slot-placeholder');
+      if (placeholder) placeholder.style.display = 'none';
+      img.parentElement.querySelectorAll('.slot-ring').forEach(r => r.style.opacity='0');
+    });
+    img.addEventListener('error', () => {
+      img.style.display = 'none';
+    });
+  }
+});
+</script>
+</body>
+</html>

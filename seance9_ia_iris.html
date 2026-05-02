@@ -1,0 +1,1378 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Séance 9 — L'IA apprend à voir — Projet IRIS</title>
+<link href="https://fonts.googleapis.com/css2?family=Space+Mono:ital,wght@0,400;0,700;1,400&family=Fraunces:ital,opsz,wght@0,9..144,300;0,9..144,700;0,9..144,900;1,9..144,300;1,9..144,700&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+:root {
+  --fond:        #04080f;
+  --fond2:       #080f1a;
+  --surface:     #0d1620;
+  --surface2:    #121e2e;
+  --bleu:        #1a6cf5;
+  --bleu-vif:    #4d8fff;
+  --bleu-pale:   #a8c8ff;
+  --cyan:        #00d4ff;
+  --cyan-dim:    rgba(0,212,255,0.15);
+  --vert:        #00e5a0;
+  --vert-dim:    rgba(0,229,160,0.12);
+  --orange:      #ff8c42;
+  --orange-dim:  rgba(255,140,66,0.12);
+  --rouge:       #ff4757;
+  --rouge-dim:   rgba(255,71,87,0.1);
+  --texte:       #dce8ff;
+  --texte-dim:   rgba(220,232,255,0.5);
+  --trait:       rgba(77,143,255,0.15);
+  --trait2:      rgba(0,212,255,0.12);
+}
+
+*,*::before,*::after { margin:0;padding:0;box-sizing:border-box; }
+html { scroll-behavior:smooth; }
+
+body {
+  background:var(--fond);
+  color:var(--texte);
+  font-family:'DM Sans',sans-serif;
+  font-weight:300;
+  overflow-x:hidden;
+  line-height:1.7;
+}
+
+/* ── SCAN LINES atmosphère ── */
+body::before {
+  content:'';
+  position:fixed;inset:0;
+  background:repeating-linear-gradient(
+    0deg,
+    transparent,
+    transparent 2px,
+    rgba(0,212,255,0.012) 2px,
+    rgba(0,212,255,0.012) 4px
+  );
+  pointer-events:none;
+  z-index:1000;
+}
+
+/* ══ HERO ══ */
+.hero {
+  min-height:100vh;
+  display:grid;
+  place-items:center;
+  position:relative;
+  overflow:hidden;
+  background:radial-gradient(ellipse 100% 80% at 50% 0%, #051228 0%, var(--fond) 65%);
+}
+
+/* Grille de fond style terminal */
+.hero-grid {
+  position:absolute;inset:0;
+  background-image:
+    linear-gradient(rgba(26,108,245,0.06) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(26,108,245,0.06) 1px, transparent 1px);
+  background-size:60px 60px;
+  animation:grid-drift 20s linear infinite;
+}
+@keyframes grid-drift {
+  from { transform:translateY(0); }
+  to   { transform:translateY(60px); }
+}
+
+/* Neurones animés */
+.neurones {
+  position:absolute;inset:0;
+  pointer-events:none;
+}
+.neurone {
+  position:absolute;
+  border-radius:50%;
+  background:var(--bleu-vif);
+  animation:float-neurone 6s ease-in-out infinite;
+  opacity:0;
+}
+.neurone:nth-child(1){width:4px;height:4px;top:20%;left:15%;animation-delay:0s;}
+.neurone:nth-child(2){width:3px;height:3px;top:35%;left:75%;animation-delay:1s;}
+.neurone:nth-child(3){width:5px;height:5px;top:60%;left:30%;animation-delay:2s;background:var(--cyan);}
+.neurone:nth-child(4){width:3px;height:3px;top:75%;left:60%;animation-delay:3s;}
+.neurone:nth-child(5){width:4px;height:4px;top:45%;left:85%;animation-delay:0.5s;background:var(--vert);}
+.neurone:nth-child(6){width:3px;height:3px;top:15%;left:50%;animation-delay:2.5s;background:var(--cyan);}
+@keyframes float-neurone {
+  0%,100%{opacity:0;transform:scale(1);}
+  50%{opacity:1;transform:scale(2.5);}
+}
+
+.hero-content {
+  position:relative;z-index:2;
+  text-align:center;
+  padding:2rem;
+  max-width:900px;
+}
+
+.hero-seq {
+  font-family:'Space Mono',monospace;
+  font-size:0.65rem;
+  letter-spacing:0.3em;
+  text-transform:uppercase;
+  color:var(--cyan);
+  opacity:0.7;
+  margin-bottom:2rem;
+  display:flex;align-items:center;justify-content:center;gap:1.5rem;
+}
+.hero-seq::before,.hero-seq::after {
+  content:'';flex:1;max-width:80px;
+  height:1px;
+  background:linear-gradient(90deg, transparent, var(--cyan));
+}
+.hero-seq::after { background:linear-gradient(90deg, var(--cyan), transparent); }
+
+.hero-seance-num {
+  font-family:'Fraunces',serif;
+  font-size:clamp(1rem,3vw,1.4rem);
+  font-weight:300;
+  color:var(--bleu-pale);
+  margin-bottom:0.5rem;
+  font-style:italic;
+}
+
+h1 {
+  font-family:'Fraunces',serif;
+  font-size:clamp(2.8rem,9vw,7rem);
+  font-weight:900;
+  line-height:0.92;
+  letter-spacing:-0.02em;
+  margin-bottom:1rem;
+}
+h1 .line1 { color:var(--texte); display:block; }
+h1 .line2 {
+  display:block;
+  background:linear-gradient(135deg, var(--cyan) 0%, var(--bleu-vif) 50%, var(--vert) 100%);
+  -webkit-background-clip:text;
+  -webkit-text-fill-color:transparent;
+  background-clip:text;
+}
+
+.hero-desc {
+  font-family:'DM Sans',sans-serif;
+  font-size:1rem;
+  color:var(--texte-dim);
+  max-width:580px;
+  margin:1.5rem auto 2.5rem;
+  line-height:1.75;
+}
+
+.hero-tags {
+  display:flex;flex-wrap:wrap;gap:0.6rem;justify-content:center;
+}
+.htag {
+  padding:0.3rem 1rem;
+  border:1px solid;
+  border-radius:0.3rem;
+  font-family:'Space Mono',monospace;
+  font-size:0.62rem;
+  letter-spacing:0.12em;
+  text-transform:uppercase;
+}
+.htag-blue  { border-color:rgba(77,143,255,0.4);color:var(--bleu-pale); }
+.htag-cyan  { border-color:rgba(0,212,255,0.35);color:var(--cyan); }
+.htag-green { border-color:rgba(0,229,160,0.35);color:var(--vert); }
+
+/* ══ LAYOUT ══ */
+main { max-width:1060px;margin:0 auto;padding:0 2rem 8rem; }
+section { padding:4.5rem 0;border-top:1px solid var(--trait); }
+
+.s-tag {
+  font-family:'Space Mono',monospace;
+  font-size:0.6rem;
+  letter-spacing:0.3em;
+  text-transform:uppercase;
+  color:var(--cyan);
+  opacity:0.65;
+  margin-bottom:0.8rem;
+}
+.s-title {
+  font-family:'Fraunces',serif;
+  font-size:clamp(1.8rem,4.5vw,3rem);
+  font-weight:700;
+  line-height:1.1;
+  margin-bottom:1.8rem;
+  color:var(--texte);
+}
+.s-title em { font-style:italic;color:var(--cyan); }
+.s-title .alt { color:var(--vert); }
+
+/* ══ CONCEPT PÉDAGOGIQUE ══ */
+.concept-split {
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:1px;
+  background:var(--trait);
+  border:1px solid var(--trait);
+  border-radius:14px;
+  overflow:hidden;
+  margin-bottom:1.5rem;
+}
+@media(max-width:640px){.concept-split{grid-template-columns:1fr;}}
+
+.concept-half {
+  background:var(--surface);
+  padding:2rem;
+}
+.ch-label {
+  font-family:'Space Mono',monospace;
+  font-size:0.6rem;
+  letter-spacing:0.2em;
+  text-transform:uppercase;
+  margin-bottom:0.8rem;
+}
+.ch-label.tm  { color:var(--orange); }
+.ch-label.py  { color:var(--vert); }
+.ch-title {
+  font-family:'Fraunces',serif;
+  font-size:1.2rem;
+  font-weight:700;
+  margin-bottom:0.6rem;
+  color:var(--texte);
+}
+.ch-desc { font-size:0.85rem;color:var(--texte-dim);line-height:1.7; }
+
+.concept-arrow {
+  display:flex;align-items:center;justify-content:center;
+  background:var(--surface);
+  padding:1.5rem;
+  font-family:'Space Mono',monospace;
+  font-size:1.5rem;
+  color:var(--bleu-vif);
+}
+@media(max-width:640px){.concept-arrow{display:none;}}
+
+/* ══ OBJECTIFS ══ */
+.objectifs-grid {
+  display:grid;
+  grid-template-columns:repeat(auto-fit,minmax(220px,1fr));
+  gap:1rem;
+}
+.obj-card {
+  background:var(--surface);
+  border:1px solid var(--trait);
+  border-radius:12px;
+  padding:1.5rem;
+  position:relative;
+  overflow:hidden;
+  transition:border-color 0.3s;
+}
+.obj-card:hover { border-color:rgba(77,143,255,0.4); }
+.obj-card::before {
+  content:attr(data-num);
+  position:absolute;top:-0.5rem;right:0.8rem;
+  font-family:'Fraunces',serif;
+  font-size:5rem;
+  font-weight:900;
+  color:rgba(77,143,255,0.05);
+  line-height:1;
+  pointer-events:none;
+}
+.obj-icon {
+  font-size:1.4rem;
+  margin-bottom:0.8rem;
+  display:block;
+}
+.obj-title {
+  font-family:'Fraunces',serif;
+  font-size:1rem;
+  font-weight:700;
+  color:var(--bleu-pale);
+  margin-bottom:0.5rem;
+}
+.obj-body { font-size:0.82rem;color:var(--texte-dim);line-height:1.65; }
+
+/* ══ PARTIE 1 — TEACHABLE MACHINE ══ */
+.tm-phases {
+  display:grid;
+  grid-template-columns:repeat(auto-fit,minmax(240px,1fr));
+  gap:1rem;
+  margin-bottom:2rem;
+}
+.tm-phase {
+  background:var(--surface);
+  border:1px solid rgba(255,140,66,0.2);
+  border-radius:12px;
+  padding:1.5rem;
+  position:relative;
+}
+.tm-phase::before {
+  content:'';
+  position:absolute;top:0;left:0;right:0;height:2px;
+  background:linear-gradient(90deg, var(--orange), transparent);
+}
+.phase-num {
+  font-family:'Space Mono',monospace;
+  font-size:0.6rem;
+  letter-spacing:0.2em;
+  text-transform:uppercase;
+  color:var(--orange);
+  margin-bottom:0.5rem;
+}
+.phase-title {
+  font-family:'Fraunces',serif;
+  font-size:1.05rem;
+  font-weight:700;
+  color:var(--texte);
+  margin-bottom:0.6rem;
+}
+.phase-body { font-size:0.82rem;color:var(--texte-dim);line-height:1.65; }
+.phase-body ul { list-style:none;margin-top:0.5rem; }
+.phase-body ul li {
+  padding:0.2rem 0 0.2rem 1rem;
+  position:relative;
+  font-size:0.8rem;
+}
+.phase-body ul li::before {
+  content:'>';
+  position:absolute;left:0;
+  color:var(--orange);
+  font-family:'Space Mono',monospace;
+}
+
+/* ══ SCHÉMA INTERACTIF ══ */
+.schema-container {
+  background:var(--surface);
+  border:1px solid var(--trait2);
+  border-radius:14px;
+  padding:2rem;
+  margin:1.5rem 0;
+  overflow-x:auto;
+}
+
+.schema-pipeline {
+  display:flex;
+  align-items:center;
+  gap:0;
+  min-width:600px;
+  justify-content:center;
+}
+
+.pipe-step {
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  gap:0.5rem;
+  flex:1;
+  cursor:pointer;
+  padding:0.8rem 0.5rem;
+  border-radius:10px;
+  transition:background 0.2s;
+}
+.pipe-step:hover { background:rgba(77,143,255,0.08); }
+
+.pipe-icon {
+  width:52px;height:52px;
+  border-radius:50%;
+  border:2px solid var(--bleu-pale);
+  display:flex;align-items:center;justify-content:center;
+  font-size:1.3rem;
+  background:var(--surface2);
+  transition:all 0.3s;
+  position:relative;
+}
+.pipe-step:hover .pipe-icon {
+  border-color:var(--cyan);
+  box-shadow:0 0 20px rgba(0,212,255,0.3);
+}
+
+.pipe-label {
+  font-family:'Space Mono',monospace;
+  font-size:0.58rem;
+  letter-spacing:0.1em;
+  text-transform:uppercase;
+  color:var(--texte-dim);
+  text-align:center;
+  line-height:1.4;
+}
+
+.pipe-arrow {
+  font-size:1rem;
+  color:var(--bleu-vif);
+  opacity:0.5;
+  flex-shrink:0;
+  padding:0 0.2rem;
+}
+
+.pipe-tooltip {
+  display:none;
+  position:fixed;
+  background:var(--surface2);
+  border:1px solid var(--cyan);
+  border-radius:10px;
+  padding:1rem 1.2rem;
+  font-size:0.8rem;
+  color:var(--texte);
+  max-width:260px;
+  z-index:200;
+  box-shadow:0 8px 32px rgba(0,0,0,0.5);
+  pointer-events:none;
+  line-height:1.6;
+}
+.pipe-tooltip.visible { display:block; }
+.pipe-tooltip strong { color:var(--cyan);display:block;margin-bottom:0.3rem;
+  font-family:'Space Mono',monospace;font-size:0.65rem;letter-spacing:0.1em;text-transform:uppercase;}
+
+/* ══ PARTIE 2 — PYTHON ══ */
+.python-steps {
+  counter-reset:py-step;
+  display:flex;
+  flex-direction:column;
+  gap:1.5rem;
+}
+
+.py-step {
+  background:var(--surface);
+  border:1px solid var(--trait);
+  border-radius:14px;
+  padding:1.8rem 2rem;
+  position:relative;
+  counter-increment:py-step;
+  border-left:3px solid var(--vert);
+  transition:border-color 0.3s;
+}
+.py-step:hover { border-left-color:var(--cyan); }
+
+.py-step-header {
+  display:flex;align-items:center;gap:1rem;
+  margin-bottom:1.2rem;flex-wrap:wrap;
+}
+.py-step-num {
+  font-family:'Space Mono',monospace;
+  font-size:0.6rem;letter-spacing:0.2em;text-transform:uppercase;
+  padding:0.2rem 0.7rem;
+  border-radius:3px;
+  background:var(--vert-dim);
+  color:var(--vert);
+  flex-shrink:0;
+}
+.py-step-title {
+  font-family:'Fraunces',serif;
+  font-size:1.1rem;font-weight:700;
+  color:var(--texte);
+}
+.py-step-notion {
+  margin-left:auto;
+  font-family:'Space Mono',monospace;
+  font-size:0.58rem;letter-spacing:0.1em;text-transform:uppercase;
+  color:rgba(0,229,160,0.5);
+}
+
+.py-grid {
+  display:grid;grid-template-columns:1fr 1fr;gap:1.5rem;
+}
+@media(max-width:640px){.py-grid{grid-template-columns:1fr;}}
+.py-grid.full { grid-template-columns:1fr; }
+
+.py-col h4 {
+  font-family:'Space Mono',monospace;
+  font-size:0.58rem;letter-spacing:0.2em;text-transform:uppercase;
+  color:var(--bleu-pale);opacity:0.6;
+  margin-bottom:0.6rem;
+}
+.py-col ul { list-style:none; }
+.py-col ul li {
+  font-size:0.83rem;color:var(--texte-dim);
+  padding:0.22rem 0 0.22rem 1rem;position:relative;line-height:1.5;
+}
+.py-col ul li::before {
+  content:'$';position:absolute;left:0;
+  color:var(--vert);
+  font-family:'Space Mono',monospace;font-size:0.7rem;
+}
+
+/* Code blocks */
+.code-block {
+  background:#020810;
+  border:1px solid rgba(0,212,255,0.15);
+  border-radius:10px;
+  padding:1.4rem 1.6rem;
+  overflow-x:auto;
+  margin-top:0.8rem;
+  position:relative;
+}
+.code-block::before {
+  content:attr(data-label);
+  position:absolute;top:0.5rem;right:0.8rem;
+  font-family:'Space Mono',monospace;
+  font-size:0.55rem;letter-spacing:0.15em;text-transform:uppercase;
+  color:rgba(0,212,255,0.35);
+}
+.code-block pre { margin:0; }
+.code-block code {
+  font-family:'Space Mono',monospace;
+  font-size:0.75rem;line-height:1.8;
+  color:#a8c8ff;
+  white-space:pre;display:block;
+}
+/* Syntaxe */
+.ck { color:#7b8fff; }   /* keyword */
+.cf { color:#00d4ff; }   /* function */
+.cs { color:#78f0a8; }   /* string */
+.cc { color:#2a3a5a;font-style:italic; } /* comment */
+.cn { color:#ff9f6b; }   /* number */
+.cm { color:#ff8c42; }   /* module */
+
+/* ══ COMPARAISON TM vs PYTHON ══ */
+.compare-table {
+  width:100%;border-collapse:collapse;font-size:0.83rem;
+}
+.compare-table th {
+  font-family:'Space Mono',monospace;
+  font-size:0.6rem;letter-spacing:0.15em;text-transform:uppercase;
+  padding:0.9rem 1rem;
+  border-bottom:1px solid rgba(0,212,255,0.2);
+  text-align:left;
+}
+.compare-table th:nth-child(2) { color:var(--orange); }
+.compare-table th:nth-child(3) { color:var(--vert); }
+.compare-table td {
+  padding:0.75rem 1rem;
+  color:var(--texte-dim);
+  border-bottom:1px solid rgba(77,143,255,0.07);
+  vertical-align:top;line-height:1.5;
+}
+.compare-table tr:hover td { background:rgba(77,143,255,0.04); }
+.compare-table td:first-child { color:var(--bleu-pale);font-weight:500; }
+.ok  { color:var(--vert);font-family:'Space Mono',monospace;font-size:0.75rem; }
+.nok { color:var(--rouge);font-family:'Space Mono',monospace;font-size:0.75rem; }
+.mid { color:var(--orange);font-family:'Space Mono',monospace;font-size:0.75rem; }
+
+/* ══ QUESTIONS ÉTHIQUES ══ */
+.questions-grid {
+  display:grid;
+  grid-template-columns:repeat(auto-fit,minmax(280px,1fr));
+  gap:1rem;
+}
+.q-card {
+  background:var(--surface);
+  border:1px solid var(--trait);
+  border-radius:12px;
+  padding:1.5rem;
+  position:relative;
+  overflow:hidden;
+}
+.q-card::after {
+  content:'?';
+  position:absolute;bottom:-1rem;right:0.5rem;
+  font-family:'Fraunces',serif;
+  font-size:7rem;font-weight:900;
+  color:rgba(77,143,255,0.04);
+  pointer-events:none;line-height:1;
+}
+.q-num {
+  font-family:'Space Mono',monospace;
+  font-size:0.6rem;letter-spacing:0.15em;text-transform:uppercase;
+  color:var(--cyan);margin-bottom:0.5rem;
+}
+.q-text {
+  font-family:'Fraunces',serif;
+  font-style:italic;font-size:1rem;font-weight:300;
+  color:var(--texte);line-height:1.6;margin-bottom:0.8rem;
+}
+.q-piste {
+  font-size:0.78rem;color:var(--texte-dim);line-height:1.6;
+}
+.q-piste strong { color:var(--bleu-pale); }
+
+/* ══ ÉVALUATION ══ */
+.eval-grid {
+  display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));
+  gap:1rem;
+}
+.eval-card {
+  background:var(--surface);
+  border:1px solid var(--trait);
+  border-radius:12px;padding:1.5rem;
+}
+.eval-card-label {
+  font-family:'Space Mono',monospace;
+  font-size:0.58rem;letter-spacing:0.18em;text-transform:uppercase;
+  color:var(--bleu-pale);opacity:0.6;margin-bottom:0.5rem;
+}
+.eval-card-title {
+  font-family:'Fraunces',serif;
+  font-size:1.05rem;font-weight:700;
+  color:var(--texte);margin-bottom:0.5rem;
+}
+.eval-pts {
+  font-family:'Space Mono',monospace;
+  font-size:1.4rem;font-weight:700;
+  color:var(--cyan);margin-bottom:0.5rem;
+}
+.eval-card p { font-size:0.8rem;color:var(--texte-dim);line-height:1.6; }
+
+/* ══ NOTE / ALERTE ══ */
+.note {
+  padding:1rem 1.5rem;
+  background:rgba(0,212,255,0.05);
+  border-left:2px solid rgba(0,212,255,0.4);
+  border-radius:0 8px 8px 0;
+  font-size:0.82rem;color:var(--texte-dim);line-height:1.65;
+  margin:1rem 0;
+}
+.note strong { color:var(--cyan); }
+.alerte {
+  padding:1rem 1.5rem;
+  background:rgba(255,71,87,0.06);
+  border-left:2px solid rgba(255,71,87,0.35);
+  border-radius:0 8px 8px 0;
+  font-size:0.82rem;color:var(--texte-dim);line-height:1.65;
+  margin:1rem 0;
+}
+.alerte strong { color:var(--rouge); }
+
+/* ══ TIMELINE MINI séance ══ */
+.seance-timeline {
+  display:flex;
+  gap:0;
+  background:var(--surface);
+  border:1px solid var(--trait);
+  border-radius:12px;
+  overflow:hidden;
+  margin:1.5rem 0;
+}
+@media(max-width:700px){.seance-timeline{flex-direction:column;}}
+.st-block {
+  flex:1;padding:1.2rem 1rem;
+  border-right:1px solid var(--trait);
+  position:relative;
+}
+.st-block:last-child { border-right:none; }
+.st-time {
+  font-family:'Space Mono',monospace;
+  font-size:0.58rem;letter-spacing:0.15em;text-transform:uppercase;
+  color:var(--cyan);opacity:0.6;margin-bottom:0.3rem;
+}
+.st-label {
+  font-size:0.83rem;color:var(--texte);font-weight:500;margin-bottom:0.3rem;
+}
+.st-detail { font-size:0.75rem;color:var(--texte-dim);line-height:1.5; }
+
+/* ══ FOOTER ══ */
+footer {
+  border-top:1px solid var(--trait);
+  padding:2.5rem 2rem;
+  max-width:1060px;margin:0 auto;
+  display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:1rem;
+}
+.footer-title {
+  font-family:'Fraunces',serif;
+  font-size:1.1rem;font-style:italic;
+  color:var(--texte-dim);
+}
+.footer-meta {
+  font-family:'Space Mono',monospace;
+  font-size:0.58rem;letter-spacing:0.12em;text-transform:uppercase;
+  color:rgba(77,143,255,0.4);text-align:right;line-height:2;
+}
+
+/* Tooltip div hors flux */
+#tooltip { position:fixed;z-index:500; }
+</style>
+</head>
+<body>
+
+<div id="tooltip">
+  <div class="pipe-tooltip" id="tt-content"></div>
+</div>
+
+<!-- ══════════ HERO ══════════ -->
+<header class="hero">
+  <div class="hero-grid"></div>
+  <div class="neurones">
+    <div class="neurone"></div><div class="neurone"></div>
+    <div class="neurone"></div><div class="neurone"></div>
+    <div class="neurone"></div><div class="neurone"></div>
+  </div>
+  <div class="hero-content">
+    <p class="hero-seq">Projet IRIS — SNT Seconde</p>
+    <p class="hero-seance-num">Séance 9 — Module Intelligence Artificielle</p>
+    <h1>
+      <span class="line1">L'IA apprend</span>
+      <span class="line2">à voir</span>
+    </h1>
+    <p class="hero-desc">
+      Entraîner un modèle de classification de la couleur des iris —
+      d'abord sans code avec Teachable Machine, puis en comprenant
+      ce que la machine fait vraiment avec Python.
+    </p>
+    <div class="hero-tags">
+      <span class="htag htag-orange">Teachable Machine</span>
+      <span class="htag htag-cyan">Python · scikit-learn</span>
+      <span class="htag htag-green">Classification</span>
+      <span class="htag htag-blue">Éthique IA</span>
+    </div>
+  </div>
+</header>
+
+<main>
+
+<!-- ══════════ CONCEPT ══════════ -->
+<section id="concept">
+  <p class="s-tag">00 — Intention pédagogique</p>
+  <h2 class="s-title">Deux temps,<br><em>une même question</em></h2>
+
+  <div class="concept-split">
+    <div class="concept-half">
+      <p class="ch-label tm">Temps 1 — 25 min</p>
+      <h3 class="ch-title">Teachable Machine</h3>
+      <p class="ch-desc">
+        L'élève entraîne un modèle en glissant-déposant des photos d'iris dans des classes
+        (bleu, vert, marron, sombre). Sans écrire une ligne de code, il voit instantanément
+        le modèle se construire et tester ses prédictions. L'effet "magie" est immédiat — et
+        c'est exactement là qu'on commence à poser les vraies questions.
+      </p>
+    </div>
+    <div class="concept-arrow">→</div>
+    <div class="concept-half">
+      <p class="ch-label py">Temps 2 — 30 min</p>
+      <h3 class="ch-title">Python · scikit-learn</h3>
+      <p class="ch-desc">
+        On "ouvre le capot". L'élève code le même classifieur en Python : extraction des
+        features RVB (déjà faite en séance 6 !), entraînement d'un KNN ou arbre de décision,
+        prédiction sur de nouvelles images. La continuité avec les séances précédentes est
+        totale — les données sont déjà là.
+      </p>
+    </div>
+  </div>
+
+  <div class="note">
+    <strong>Fil conducteur pédagogique :</strong> les élèves utilisent les moyennes RVB calculées
+    en séance 6 comme features d'entrée du classifieur. Ce qu'ils ont "fait à la main" devient
+    la matière première de l'IA. La continuité est explicite et puissante.
+  </div>
+
+  <div class="objectifs-grid" style="margin-top:1.5rem;">
+    <div class="obj-card" data-num="1">
+      <span class="obj-icon">🧠</span>
+      <h3 class="obj-title">Comprendre ce qu'est un modèle</h3>
+      <p class="obj-body">Une IA n'est pas magique — c'est une fonction mathématique apprise à partir d'exemples. Les élèves en sont les auteurs.</p>
+    </div>
+    <div class="obj-card" data-num="2">
+      <span class="obj-icon">📊</span>
+      <h3 class="obj-title">Données = pouvoir</h3>
+      <p class="obj-body">La qualité du modèle dépend entièrement des données d'entraînement. Un mauvais jeu de données produit un mauvais modèle — et des décisions injustes.</p>
+    </div>
+    <div class="obj-card" data-num="3">
+      <span class="obj-icon">⚠️</span>
+      <h3 class="obj-title">Biais & limites</h3>
+      <p class="obj-body">Si la classe ne contient que des yeux marron, le modèle sera mauvais sur les yeux bleus. C'est la définition d'un biais algorithmique — concret et vécu.</p>
+    </div>
+    <div class="obj-card" data-num="4">
+      <span class="obj-icon">🔗</span>
+      <h3 class="obj-title">Continuité du projet</h3>
+      <p class="obj-body">Les moyennes RVB de la séance 6 deviennent les features du classifieur. L'élève voit que tout le projet s'enchaîne logiquement.</p>
+    </div>
+  </div>
+</section>
+
+<!-- ══════════ DÉROULÉ SÉANCE ══════════ -->
+<section id="deroulé">
+  <p class="s-tag">01 — Organisation de la séance</p>
+  <h2 class="s-title">55 minutes,<br><em class="alt">chrono précis</em></h2>
+
+  <div class="seance-timeline">
+    <div class="st-block">
+      <p class="st-time">0 → 5 min</p>
+      <p class="st-label">Accroche</p>
+      <p class="st-detail">Montrer une démo de reconnaissance irienne commerciale (WorldCoin, passeport biométrique). Poser la question : "Comment ça marche ?"</p>
+    </div>
+    <div class="st-block">
+      <p class="st-time">5 → 30 min</p>
+      <p class="st-label">Teachable Machine</p>
+      <p class="st-detail">Entraînement collectif puis individuel. 4 classes de couleur. Test sur iris inconnus. Observation des erreurs.</p>
+    </div>
+    <div class="st-block">
+      <p class="st-time">30 → 50 min</p>
+      <p class="st-label">Python scikit-learn</p>
+      <p class="st-detail">Script guidé : chargement des données séance 6, KNN, entraînement, prédiction, matrice de confusion.</p>
+    </div>
+    <div class="st-block">
+      <p class="st-time">50 → 55 min</p>
+      <p class="st-label">Bilan éthique</p>
+      <p class="st-detail">5 minutes de discussion : "Notre modèle serait-il juste pour tout le monde ?" Lien avec l'exposition.</p>
+    </div>
+  </div>
+</section>
+
+<!-- ══════════ PIPELINE INTERACTIF ══════════ -->
+<section id="pipeline">
+  <p class="s-tag">02 — Comprendre le pipeline IA</p>
+  <h2 class="s-title">Comment une IA<br><em>apprend à classer</em></h2>
+  <p style="font-size:0.88rem;color:var(--texte-dim);margin-bottom:1.5rem;max-width:580px;">
+    Survoler chaque étape pour comprendre ce qui se passe réellement à l'intérieur du modèle.
+  </p>
+
+  <div class="schema-container">
+    <div class="schema-pipeline">
+
+      <div class="pipe-step"
+           data-tip-title="1. Données brutes"
+           data-tip="Les photos d'iris de la classe. Chaque image est étiquetée manuellement par l'élève : 'bleu', 'vert', 'marron' ou 'sombre'. C'est le travail humain qui rend l'apprentissage possible.">
+        <div class="pipe-icon">📷</div>
+        <p class="pipe-label">Photos<br>étiquetées</p>
+      </div>
+      <div class="pipe-arrow">›</div>
+
+      <div class="pipe-step"
+           data-tip-title="2. Extraction de features"
+           data-tip="On ne donne pas l'image brute à l'IA. On calcule des résumés numériques : moyenne R, moyenne G, moyenne B de chaque iris (séance 6). Ces 3 nombres sont les 'features' — l'IA ne voit que ça.">
+        <div class="pipe-icon">🔢</div>
+        <p class="pipe-label">Features<br>RVB moyennes</p>
+      </div>
+      <div class="pipe-arrow">›</div>
+
+      <div class="pipe-step"
+           data-tip-title="3. Entraînement"
+           data-tip="L'algorithme KNN (K plus proches voisins) mémorise tous les exemples. Pour classer un nouvel iris, il cherche les K iris les plus proches dans l'espace RVB et vote. Pas de formule magique : juste de la distance !">
+        <div class="pipe-icon">⚙️</div>
+        <p class="pipe-label">Entraînement<br>KNN / Arbre</p>
+      </div>
+      <div class="pipe-arrow">›</div>
+
+      <div class="pipe-step"
+           data-tip-title="4. Modèle entraîné"
+           data-tip="Le modèle est une 'mémoire' de tous les iris vus. Il peut maintenant prédire la couleur d'un iris qu'il n'a jamais vu. Sa performance dépend de la diversité et de la qualité des données d'entraînement.">
+        <div class="pipe-icon">🧠</div>
+        <p class="pipe-label">Modèle<br>entraîné</p>
+      </div>
+      <div class="pipe-arrow">›</div>
+
+      <div class="pipe-step"
+           data-tip-title="5. Prédiction"
+           data-tip="On donne un nouvel iris (non vu pendant l'entraînement). Le modèle calcule ses moyennes RVB, trouve les voisins les plus proches et annonce sa prédiction avec un score de confiance (ex: 87% marron).">
+        <div class="pipe-icon">🔮</div>
+        <p class="pipe-label">Nouvelle<br>prédiction</p>
+      </div>
+      <div class="pipe-arrow">›</div>
+
+      <div class="pipe-step"
+           data-tip-title="6. Évaluation"
+           data-tip="On compare les prédictions aux vraies étiquettes. La matrice de confusion montre exactement où le modèle se trompe. Un modèle qui confond 'bleu' et 'vert' nous dit que ces couleurs sont proches dans l'espace RVB.">
+        <div class="pipe-icon">📈</div>
+        <p class="pipe-label">Matrice de<br>confusion</p>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<!-- ══════════ PARTIE 1 — TEACHABLE MACHINE ══════════ -->
+<section id="teachable">
+  <p class="s-tag">03 — Temps 1 · Teachable Machine</p>
+  <h2 class="s-title">Sans code,<br><em>le modèle se construit</em></h2>
+
+  <div class="tm-phases">
+    <div class="tm-phase">
+      <p class="phase-num">Étape A — 5 min</p>
+      <h3 class="phase-title">Créer le projet</h3>
+      <div class="phase-body">
+        <p>Aller sur <strong style="color:var(--orange)">teachablemachine.withgoogle.com</strong> → "Nouveau projet" → "Projet Image".</p>
+        <ul>
+          <li>Renommer les classes : Bleu / Vert / Marron / Sombre</li>
+          <li>Chaque groupe crée son propre projet</li>
+          <li>Objectif : 15 à 20 images par classe minimum</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="tm-phase">
+      <p class="phase-num">Étape B — 10 min</p>
+      <h3 class="phase-title">Collecter les données</h3>
+      <div class="phase-body">
+        <p>Importer les photos d'iris de la classe (déjà disponibles depuis les séances précédentes).</p>
+        <ul>
+          <li>Glisser-déposer les photos dans la bonne classe</li>
+          <li>Prendre aussi des iris libres de droits en ligne pour enrichir</li>
+          <li>Observer : combien d'exemples par couleur dans la classe ?</li>
+          <li>Anticiper le biais si une couleur est sous-représentée</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="tm-phase">
+      <p class="phase-num">Étape C — 5 min</p>
+      <h3 class="phase-title">Entraîner</h3>
+      <div class="phase-body">
+        <p>Cliquer sur <strong style="color:var(--orange)">"Entraîner le modèle"</strong>. Observer la barre de progression.</p>
+        <ul>
+          <li>Combien d'epochs ? Qu'est-ce qu'une epoch ?</li>
+          <li>La courbe de perte diminue — que signifie "apprendre" ?</li>
+          <li>Tester immédiatement avec la webcam ou une image</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="tm-phase">
+      <p class="phase-num">Étape D — 5 min</p>
+      <h3 class="phase-title">Tester & questionner</h3>
+      <div class="phase-body">
+        <p>Tester avec des iris que le modèle n'a <em>jamais vus</em>.</p>
+        <ul>
+          <li>Où se trompe-t-il ? Pourquoi ?</li>
+          <li>Que se passe-t-il si on change l'éclairage ?</li>
+          <li>Score de confiance : 60% vs 99% — quelle différence ?</li>
+          <li>Est-ce qu'il reconnaît un iris sur un écran de téléphone ?</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <div class="note">
+    <strong>Astuce enseignant :</strong> demander à chaque groupe d'entraîner avec des
+    données légèrement différentes. Comparer ensuite les précisions — c'est la meilleure
+    démonstration concrète que "les données font le modèle".
+  </div>
+</section>
+
+<!-- ══════════ PARTIE 2 — PYTHON ══════════ -->
+<section id="python">
+  <p class="s-tag">04 — Temps 2 · Python scikit-learn</p>
+  <h2 class="s-title">Ouvrir le capot,<br><em class="alt">coder le même modèle</em></h2>
+
+  <p style="font-size:0.88rem;color:var(--texte-dim);margin-bottom:2rem;max-width:600px;line-height:1.75;">
+    On reprend exactement les données de la séance 6 (moyennes RVB de chaque iris).
+    L'élève code le pipeline complet : chargement → features → entraînement → prédiction → évaluation.
+  </p>
+
+  <div class="python-steps">
+
+    <!-- ÉTAPE 1 -->
+    <div class="py-step">
+      <div class="py-step-header">
+        <span class="py-step-num">Étape 1</span>
+        <span class="py-step-title">Préparer les données</span>
+        <span class="py-step-notion">Listes · Dictionnaires</span>
+      </div>
+      <div class="py-grid">
+        <div class="py-col">
+          <h4>Ce que fait ce code</h4>
+          <ul>
+            <li>Calcule les moyennes RVB de chaque iris (réutilise la fonction séance 6)</li>
+            <li>Crée un tableau de features X et un tableau d'étiquettes y</li>
+            <li>Chaque ligne de X = un iris décrit par 3 nombres</li>
+          </ul>
+        </div>
+        <div class="py-col">
+          <h4>Notion clé</h4>
+          <ul>
+            <li>Un dataset = (X, y) — features et labels</li>
+            <li>Ici X a 3 colonnes : moy_R, moy_G, moy_B</li>
+            <li>y contient la couleur réelle : "bleu", "vert", etc.</li>
+          </ul>
+        </div>
+      </div>
+      <div class="py-grid full">
+        <div class="code-block" data-label="etape1_donnees.py"><pre><code><span class="ck">from</span> PIL <span class="ck">import</span> Image
+<span class="ck">import</span> os
+
+<span class="ck">def</span> <span class="cf">extraire_features</span>(chemin_image):
+    <span class="cs">"""Retourne (moy_R, moy_G, moy_B) d'une image iris."""</span>
+    img = Image.<span class="cf">open</span>(chemin_image).<span class="cf">convert</span>(<span class="cs">"RGB"</span>)
+    pixels = <span class="cf">list</span>(img.<span class="cf">getdata</span>())
+    n = <span class="cf">len</span>(pixels)
+    moy_r = <span class="cf">sum</span>(p[<span class="cn">0</span>] <span class="ck">for</span> p <span class="ck">in</span> pixels) / n
+    moy_g = <span class="cf">sum</span>(p[<span class="cn">1</span>] <span class="ck">for</span> p <span class="ck">in</span> pixels) / n
+    moy_b = <span class="cf">sum</span>(p[<span class="cn">2</span>] <span class="ck">for</span> p <span class="ck">in</span> pixels) / n
+    <span class="ck">return</span> [moy_r, moy_g, moy_b]
+
+<span class="cc"># Structure des données : dossier par couleur</span>
+<span class="cc"># iris_dataset/bleu/    iris_dataset/vert/</span>
+<span class="cc"># iris_dataset/marron/  iris_dataset/sombre/</span>
+
+X = []  <span class="cc"># features : liste de [moy_R, moy_G, moy_B]</span>
+y = []  <span class="cc"># labels   : liste de couleurs</span>
+
+couleurs = [<span class="cs">"bleu"</span>, <span class="cs">"vert"</span>, <span class="cs">"marron"</span>, <span class="cs">"sombre"</span>]
+<span class="ck">for</span> couleur <span class="ck">in</span> couleurs:
+    dossier = <span class="cs">f"iris_dataset/{couleur}/"</span>
+    <span class="ck">if not</span> os.path.<span class="cf">exists</span>(dossier):
+        <span class="ck">continue</span>
+    <span class="ck">for</span> fichier <span class="ck">in</span> os.<span class="cf">listdir</span>(dossier):
+        <span class="ck">if</span> fichier.<span class="cf">endswith</span>((<span class="cs">".jpg"</span>, <span class="cs">".png"</span>)):
+            features = <span class="cf">extraire_features</span>(dossier + fichier)
+            X.<span class="cf">append</span>(features)
+            y.<span class="cf">append</span>(couleur)
+
+<span class="cf">print</span>(<span class="cs">f"Dataset : {len(X)} images, {len(set(y))} classes"</span>)
+<span class="cf">print</span>(<span class="cs">f"Exemple de features : {X[0]}"</span>)
+</code></pre></div>
+      </div>
+    </div>
+
+    <!-- ÉTAPE 2 -->
+    <div class="py-step">
+      <div class="py-step-header">
+        <span class="py-step-num">Étape 2</span>
+        <span class="py-step-title">Entraîner le classifieur KNN</span>
+        <span class="py-step-notion">scikit-learn · KNN</span>
+      </div>
+      <div class="py-grid">
+        <div class="py-col">
+          <h4>Ce que fait ce code</h4>
+          <ul>
+            <li>Divise les données en train (80%) et test (20%)</li>
+            <li>Crée un classifieur KNN avec K=3 voisins</li>
+            <li>L'entraîne sur les données d'entraînement</li>
+            <li>Mesure la précision sur les données de test</li>
+          </ul>
+        </div>
+        <div class="py-col">
+          <h4>Notion clé — KNN</h4>
+          <ul>
+            <li>K=3 : pour classer, on regarde les 3 iris les plus proches</li>
+            <li>"Plus proche" = distance euclidienne dans l'espace RVB</li>
+            <li>Vote majoritaire parmi les 3 voisins → prédiction</li>
+            <li>Changer K modifie le comportement : tester K=1, K=5, K=9</li>
+          </ul>
+        </div>
+      </div>
+      <div class="py-grid full">
+        <div class="code-block" data-label="etape2_knn.py"><pre><code><span class="ck">from</span> sklearn.model_selection <span class="ck">import</span> train_test_split
+<span class="ck">from</span> sklearn.neighbors <span class="ck">import</span> KNeighborsClassifier
+<span class="ck">from</span> sklearn.metrics <span class="ck">import</span> accuracy_score
+
+<span class="cc"># Diviser en données d'entraînement et de test</span>
+X_train, X_test, y_train, y_test = <span class="cf">train_test_split</span>(
+    X, y,
+    test_size=<span class="cn">0.2</span>,       <span class="cc"># 20% pour le test</span>
+    random_state=<span class="cn">42</span>,    <span class="cc"># reproductibilité</span>
+    stratify=y           <span class="cc"># equilibrer les classes</span>
+)
+
+<span class="cf">print</span>(<span class="cs">f"Entraînement : {len(X_train)} iris"</span>)
+<span class="cf">print</span>(<span class="cs">f"Test         : {len(X_test)} iris"</span>)
+
+<span class="cc"># Créer et entraîner le classifieur KNN</span>
+knn = <span class="cf">KNeighborsClassifier</span>(n_neighbors=<span class="cn">3</span>)
+knn.<span class="cf">fit</span>(X_train, y_train)
+
+<span class="cc"># Évaluer sur les données de test</span>
+y_pred = knn.<span class="cf">predict</span>(X_test)
+precision = <span class="cf">accuracy_score</span>(y_test, y_pred)
+<span class="cf">print</span>(<span class="cs">f"\nPrecision du modele KNN (K=3) : {precision*100:.1f}%"</span>)
+
+<span class="cc"># Tester avec différentes valeurs de K</span>
+<span class="cf">print</span>(<span class="cs">"\nInfluence de K :"</span>)
+<span class="ck">for</span> k <span class="ck">in</span> [<span class="cn">1</span>, <span class="cn">3</span>, <span class="cn">5</span>, <span class="cn">7</span>, <span class="cn">9</span>]:
+    modele_k = <span class="cf">KNeighborsClassifier</span>(n_neighbors=k)
+    modele_k.<span class="cf">fit</span>(X_train, y_train)
+    prec_k = <span class="cf">accuracy_score</span>(y_test, modele_k.<span class="cf">predict</span>(X_test))
+    <span class="cf">print</span>(<span class="cs">f"  K={k} : {prec_k*100:.1f}%"</span>)
+</code></pre></div>
+      </div>
+    </div>
+
+    <!-- ÉTAPE 3 -->
+    <div class="py-step">
+      <div class="py-step-header">
+        <span class="py-step-num">Étape 3</span>
+        <span class="py-step-title">Matrice de confusion — Où se trompe-t-il ?</span>
+        <span class="py-step-notion">Évaluation · Biais</span>
+      </div>
+      <div class="py-grid">
+        <div class="py-col">
+          <h4>Ce que fait ce code</h4>
+          <ul>
+            <li>Affiche quelle couleur est confondue avec quelle autre</li>
+            <li>Révèle les biais du modèle de façon visuelle</li>
+            <li>Permet de comprendre quelles classes sont "difficiles"</li>
+          </ul>
+        </div>
+        <div class="py-col">
+          <h4>Notion clé</h4>
+          <ul>
+            <li>Ligne = couleur réelle, Colonne = couleur prédite</li>
+            <li>Diagonale parfaite = modèle parfait</li>
+            <li>Une erreur "bleu → vert" : leurs RVB se ressemblent</li>
+            <li>Lien direct avec la question éthique des biais IA</li>
+          </ul>
+        </div>
+      </div>
+      <div class="py-grid full">
+        <div class="code-block" data-label="etape3_confusion.py"><pre><code><span class="ck">from</span> sklearn.metrics <span class="ck">import</span> confusion_matrix, classification_report
+
+<span class="cc"># Matrice de confusion</span>
+classes = [<span class="cs">"bleu"</span>, <span class="cs">"vert"</span>, <span class="cs">"marron"</span>, <span class="cs">"sombre"</span>]
+matrice = <span class="cf">confusion_matrix</span>(y_test, y_pred, labels=classes)
+
+<span class="cf">print</span>(<span class="cs">"Matrice de confusion :"</span>)
+<span class="cf">print</span>(<span class="cs">f"{'':10s}"</span> + <span class="cs">" "</span>.<span class="cf">join</span>(<span class="cs">f"{c:8s}"</span> <span class="ck">for</span> c <span class="ck">in</span> classes))
+<span class="ck">for</span> i, ligne <span class="ck">in</span> <span class="cf">enumerate</span>(matrice):
+    <span class="cf">print</span>(<span class="cs">f"{classes[i]:10s}"</span> + <span class="cs">" "</span>.<span class="cf">join</span>(<span class="cs">f"{v:8d}"</span> <span class="ck">for</span> v <span class="ck">in</span> ligne))
+
+<span class="cc"># Rapport détaillé par classe</span>
+<span class="cf">print</span>(<span class="cs">"\nRapport par couleur :"</span>)
+<span class="cf">print</span>(<span class="cf">classification_report</span>(y_test, y_pred, target_names=classes))
+
+<span class="cc"># Prédire un nouvel iris inconnu</span>
+<span class="cf">print</span>(<span class="cs">"\n--- Test sur un iris inconnu ---"</span>)
+iris_inconnu = <span class="cf">extraire_features</span>(<span class="cs">"nouvel_iris.png"</span>)
+prediction = knn.<span class="cf">predict</span>([iris_inconnu])[<span class="cn">0</span>]
+proba = knn.<span class="cf">predict_proba</span>([iris_inconnu])[<span class="cn">0</span>]
+<span class="cf">print</span>(<span class="cs">f"Couleur predite : {prediction}"</span>)
+<span class="ck">for</span> c, p <span class="ck">in</span> <span class="cf">zip</span>(knn.classes_, proba):
+    barre = <span class="cs">"█"</span> * <span class="cf">int</span>(p * <span class="cn">20</span>)
+    <span class="cf">print</span>(<span class="cs">f"  {c:8s} {barre:20s} {p*100:.1f}%"</span>)
+</code></pre></div>
+      </div>
+    </div>
+
+    <!-- ÉTAPE 4 — BONUS -->
+    <div class="py-step">
+      <div class="py-step-header">
+        <span class="py-step-num">Étape 4 — Bonus</span>
+        <span class="py-step-title">Arbre de décision — Voir les règles apprises</span>
+        <span class="py-step-notion">Interprétabilité · Arbre</span>
+      </div>
+      <div class="py-grid">
+        <div class="py-col">
+          <h4>Pourquoi c'est fort pédagogiquement</h4>
+          <ul>
+            <li>L'arbre de décision est le seul classifieur qu'on peut lire en français</li>
+            <li>L'élève voit exactement la règle apprise : "Si moy_B &gt; 120 alors bleu"</li>
+            <li>Permet de vérifier si la règle est sensée — ou absurde</li>
+            <li>Idéal pour discuter de l'interprétabilité des IA</li>
+          </ul>
+        </div>
+        <div class="py-col">
+          <h4>Question de réflexion</h4>
+          <ul>
+            <li>L'arbre a-t-il appris une règle qui "a du sens" pour nous ?</li>
+            <li>Qu'est-ce qui se passe si on lui donne un iris rouge (pathologie) ?</li>
+            <li>Un arbre très profond = surapprentissage. Qu'est-ce que ça veut dire ?</li>
+            <li>Peut-on faire confiance à une IA dont on ne comprend pas les règles ?</li>
+          </ul>
+        </div>
+      </div>
+      <div class="py-grid full">
+        <div class="code-block" data-label="etape4_arbre.py"><pre><code><span class="ck">from</span> sklearn.tree <span class="ck">import</span> DecisionTreeClassifier, export_text
+<span class="ck">import</span> matplotlib.pyplot <span class="ck">as</span> plt
+<span class="ck">from</span> sklearn <span class="ck">import</span> tree
+
+<span class="cc"># Entraîner un arbre de décision</span>
+arbre = <span class="cf">DecisionTreeClassifier</span>(max_depth=<span class="cn">4</span>, random_state=<span class="cn">42</span>)
+arbre.<span class="cf">fit</span>(X_train, y_train)
+
+precision_arbre = <span class="cf">accuracy_score</span>(y_test, arbre.<span class="cf">predict</span>(X_test))
+<span class="cf">print</span>(<span class="cs">f"Precision arbre de decision : {precision_arbre*100:.1f}%"</span>)
+
+<span class="cc"># Afficher les règles en texte lisible</span>
+regles = <span class="cf">export_text</span>(arbre, feature_names=[<span class="cs">"moy_R"</span>, <span class="cs">"moy_G"</span>, <span class="cs">"moy_B"</span>])
+<span class="cf">print</span>(<span class="cs">"\nRegles apprises par l'arbre :"</span>)
+<span class="cf">print</span>(regles)
+
+<span class="cc"># Visualisation graphique de l'arbre</span>
+fig, ax = plt.<span class="cf">subplots</span>(figsize=(<span class="cn">14</span>, <span class="cn">6</span>))
+tree.<span class="cf">plot_tree</span>(
+    arbre,
+    feature_names=[<span class="cs">"moy_R"</span>, <span class="cs">"moy_G"</span>, <span class="cs">"moy_B"</span>],
+    class_names=arbre.classes_,
+    filled=<span class="cn">True</span>,
+    rounded=<span class="cn">True</span>,
+    fontsize=<span class="cn">9</span>,
+    ax=ax
+)
+plt.<span class="cf">title</span>(<span class="cs">"Arbre de decision — Classification couleur d'iris"</span>)
+plt.<span class="cf">savefig</span>(<span class="cs">"arbre_iris.png"</span>, dpi=<span class="cn">150</span>, bbox_inches=<span class="cs">"tight"</span>)
+plt.<span class="cf">show</span>()
+<span class="cf">print</span>(<span class="cs">"Arbre sauvegarde : arbre_iris.png"</span>)
+</code></pre></div>
+      </div>
+    </div>
+
+  </div>
+</section>
+
+<!-- ══════════ COMPARAISON TM VS PYTHON ══════════ -->
+<section id="comparaison">
+  <p class="s-tag">05 — Bilan comparatif</p>
+  <h2 class="s-title">Teachable Machine<br><em>vs Python — face à face</em></h2>
+
+  <table class="compare-table">
+    <thead>
+      <tr>
+        <th>Critère</th>
+        <th>🟠 Teachable Machine</th>
+        <th>🟢 Python scikit-learn</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td>Prise en main</td>
+        <td><span class="ok">✓ Immédiate</span> — glisser-déposer</td>
+        <td><span class="mid">~ 10 min</span> — installer scikit-learn</td>
+      </tr>
+      <tr>
+        <td>Compréhension de l'algorithme</td>
+        <td><span class="nok">✗ Boîte noire</span> — réseau de neurones opaque</td>
+        <td><span class="ok">✓ Lisible</span> — règles visibles (arbre)</td>
+      </tr>
+      <tr>
+        <td>Contrôle des données</td>
+        <td><span class="mid">~ Partiel</span> — données envoyées à Google</td>
+        <td><span class="ok">✓ Total</span> — tout reste local</td>
+      </tr>
+      <tr>
+        <td>Interprétabilité</td>
+        <td><span class="nok">✗ Impossible</span> — CNN non interprétable</td>
+        <td><span class="ok">✓ Totale</span> — arbre de décision en français</td>
+      </tr>
+      <tr>
+        <td>Détection des biais</td>
+        <td><span class="mid">~ Visible</span> — score global seulement</td>
+        <td><span class="ok">✓ Précise</span> — matrice de confusion par classe</td>
+      </tr>
+      <tr>
+        <td>Utilisation pro / réelle</td>
+        <td><span class="mid">~ Prototypage</span> rapide</td>
+        <td><span class="ok">✓ Déploiement</span> en production</td>
+      </tr>
+      <tr>
+        <td>Lien avec le programme SNT</td>
+        <td><span class="ok">✓ IA comme outil</span></td>
+        <td><span class="ok">✓ IA + données + algorithme</span></td>
+      </tr>
+    </tbody>
+  </table>
+
+  <div class="note" style="margin-top:1.5rem;">
+    <strong>Message clé à retenir :</strong> Teachable Machine "fait" l'IA pour toi —
+    Python te permet de <em>comprendre</em> ce que l'IA fait. Les deux sont utiles,
+    mais seul le deuxième te donne le pouvoir de la questionner, de la corriger
+    et d'en assumer la responsabilité.
+  </div>
+</section>
+
+<!-- ══════════ QUESTIONS ÉTHIQUES ══════════ -->
+<section id="ethique">
+  <p class="s-tag">06 — 5 minutes de bilan éthique</p>
+  <h2 class="s-title">Cinq questions<br><em>qui dérangent</em></h2>
+
+  <div class="questions-grid">
+    <div class="q-card">
+      <p class="q-num">Question 01</p>
+      <p class="q-text">« Notre modèle est-il juste pour tout le monde dans la classe ? »</p>
+      <p class="q-piste"><strong>Piste :</strong> si la classe a 25 yeux marron et 2 yeux bleus, le modèle sera mauvais sur les yeux bleus. C'est la définition d'un <strong>biais de représentation</strong> — et c'est exactement ce qui se passe dans les vrais systèmes de reconnaissance faciale.</p>
+    </div>
+    <div class="q-card">
+      <p class="q-num">Question 02</p>
+      <p class="q-text">« Pourquoi un modèle à 95% de précision peut quand même être dangereux ? »</p>
+      <p class="q-piste"><strong>Piste :</strong> 5% d'erreurs sur 1 milliard de personnes = 50 millions de personnes mal identifiées. La matrice de confusion révèle souvent que ces 5% touchent toujours les mêmes groupes.</p>
+    </div>
+    <div class="q-card">
+      <p class="q-num">Question 03</p>
+      <p class="q-text">« Qui est responsable quand l'IA se trompe et qu'une personne est injustement fichée ? »</p>
+      <p class="q-piste"><strong>Piste :</strong> le développeur qui a entraîné ? L'entreprise qui l'a déployé ? L'État qui l'a autorisé ? La personne qui a donné ses données ? Il n'y a pas de réponse simple — c'est pourquoi le RGPD impose la traçabilité.</p>
+    </div>
+    <div class="q-card">
+      <p class="q-num">Question 04</p>
+      <p class="q-text">« En utilisant Teachable Machine, avons-nous contribué à entraîner les IA de Google ? »</p>
+      <p class="q-piste"><strong>Piste :</strong> les CGU de Teachable Machine méritent d'être lues. C'est le prolongement direct de la séance 5 sur les données EXIF et les réseaux sociaux — chaque interaction numérique laisse des traces exploitables.</p>
+    </div>
+    <div class="q-card">
+      <p class="q-num">Question 05</p>
+      <p class="q-text">« Notre classifieur peut-il reconnaître une maladie oculaire ? Devrait-il le faire ? »</p>
+      <p class="q-piste"><strong>Piste :</strong> techniquement peut-être. Légalement et éthiquement : non, sans dispositif médical certifié, sans médecin, sans consentement informé pour un usage médical. La frontière entre "outil" et "dispositif médical" est définie par la loi — et les IA la franchissent parfois sans le dire.</p>
+    </div>
+    <div class="q-card">
+      <p class="q-num">Question 06</p>
+      <p class="q-text">« Peut-on exposer les résultats de notre classifieur à l'exposition ? »</p>
+      <p class="q-piste"><strong>Piste :</strong> lien direct avec l'exposition finale. Montrer les prédictions sans montrer les photos sources, expliquer les limites, afficher la précision et les erreurs. La transparence algorithmique comme valeur esthétique et éthique.</p>
+    </div>
+  </div>
+</section>
+
+<!-- ══════════ ÉVALUATION ══════════ -->
+<section id="evaluation">
+  <p class="s-tag">07 — Évaluation de la séance</p>
+  <h2 class="s-title">Ce qu'on<br><em>évalue</em></h2>
+
+  <div class="eval-grid">
+    <div class="eval-card">
+      <p class="eval-card-label">Compréhension</p>
+      <h3 class="eval-card-title">Pipeline IA</h3>
+      <p class="eval-pts">4 pts</p>
+      <p>Sait expliquer les étapes : données → features → entraînement → prédiction → évaluation. Comprend ce qu'est un label et une feature.</p>
+    </div>
+    <div class="eval-card">
+      <p class="eval-card-label">Pratique</p>
+      <h3 class="eval-card-title">Script Python fonctionnel</h3>
+      <p class="eval-pts">4 pts</p>
+      <p>Le script charge les données, entraîne le KNN, affiche la précision et au moins une prédiction sur un iris inconnu.</p>
+    </div>
+    <div class="eval-card">
+      <p class="eval-card-label">Analyse</p>
+      <h3 class="eval-card-title">Matrice de confusion</h3>
+      <p class="eval-pts">3 pts</p>
+      <p>Sait lire et interpréter la matrice. Identifie les classes confondues et propose une explication (ressemblance RVB).</p>
+    </div>
+    <div class="eval-card">
+      <p class="eval-card-label">Éthique</p>
+      <h3 class="eval-card-title">Réflexion argumentée</h3>
+      <p class="eval-pts">3 pts</p>
+      <p>Formule au moins un argument pertinent sur les biais, la responsabilité ou les limites du modèle construit en classe.</p>
+    </div>
+    <div class="eval-card">
+      <p class="eval-card-label">Bonus</p>
+      <h3 class="eval-card-title">Arbre de décision</h3>
+      <p class="eval-pts">+2 pts</p>
+      <p>Code l'arbre, exporte la visualisation, et commente une règle apprise : est-elle sensée ? surprenante ?</p>
+    </div>
+  </div>
+
+  <div class="alerte" style="margin-top:1.5rem;">
+    <strong>Prérequis technique :</strong> installer scikit-learn et matplotlib avant la séance —
+    <code style="color:#ff8c42;font-family:'Space Mono',monospace;font-size:0.8rem;">pip install scikit-learn matplotlib</code>
+    — et préparer un dossier <code style="color:#ff8c42;font-family:'Space Mono',monospace;font-size:0.8rem;">iris_dataset/</code>
+    avec sous-dossiers par couleur, pré-rempli avec quelques iris libres de droits pour les élèves non-consentants.
+  </div>
+
+  <div class="note">
+    <strong>Différenciation :</strong> élèves avancés — implémenter un classifieur Naive Bayes
+    et comparer sa précision au KNN. Élèves en difficulté — fournir X et y déjà calculés
+    dans un fichier CSV et commencer directement à l'étape 2.
+  </div>
+</section>
+
+</main>
+
+<footer>
+  <p class="footer-title">"La machine voit ce qu'on lui apprend à voir."</p>
+  <p class="footer-meta">
+    Lycée Antoine Watteau — Valenciennes<br>
+    Projet IRIS — Séance 9 — Module IA<br>
+    DarkSATHI Li
+  </p>
+</footer>
+
+<script>
+// ── Pipeline interactif — tooltip au survol ──
+const steps = document.querySelectorAll('.pipe-step');
+const tooltip = document.getElementById('tt-content');
+
+steps.forEach(step => {
+  step.addEventListener('mouseenter', (e) => {
+    tooltip.innerHTML = `<strong>${step.dataset.tipTitle}</strong>${step.dataset.tip}`;
+    tooltip.classList.add('visible');
+  });
+  step.addEventListener('mousemove', (e) => {
+    const x = e.clientX + 15;
+    const y = e.clientY - 10;
+    const tw = tooltip.offsetWidth;
+    const th = tooltip.offsetHeight;
+    tooltip.style.left = (x + tw > window.innerWidth ? e.clientX - tw - 15 : x) + 'px';
+    tooltip.style.top  = (y + th > window.innerHeight ? e.clientY - th - 10 : y) + 'px';
+  });
+  step.addEventListener('mouseleave', () => {
+    tooltip.classList.remove('visible');
+  });
+});
+</script>
+</body>
+</html>
