@@ -21,7 +21,7 @@
       --or-pale: #f5e6c8;
       --rouge: #c0424a;
       --vert: #2e7d52;
-      --texte: #f1f6f7;
+      --texte: #e8e4f0;
       --texte-dim: rgba(232, 228, 240, 0.55);
       --trait: rgba(139, 92, 246, 0.18);
     }
@@ -103,41 +103,36 @@
     }
 
     .orbit:nth-child(5) {
-      width: 320px;
-      height: 210px;
-      border-radius: 50% / 50%;
-      border-color: rgba(196, 181, 253, 0.22);
+      width: 200px;
+      height: 200px;
+      border-color: rgba(196, 181, 253, 0.50);
       animation-delay: 4.8s;
-      overflow: visible;
+      overflow: hidden;
       background: transparent;
-      pointer-events: none;
     }
 
     .orbit:nth-child(5) .iris-photo {
-      width: max(100%, 600px);
-      height: auto;
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      border-radius: 50%;
       display: block;
       opacity: 0.92;
-      border-radius: 0;
       filter: brightness(1.05) contrast(1.08) saturate(1.1);
       animation: photo-pulse 8s ease-in-out infinite;
       animation-delay: 4.8s;
-      position: absolute;
-      top: 50%;
-      left: 50%;
-      transform: translate(-50%, -50%) scale(1);
     }
 
     @keyframes photo-pulse {
 
       0%,
       100% {
-        transform: translate(-50%, -50%) scale(1);
+        transform: scale(1);
         filter: brightness(1.05) contrast(1.08) saturate(1.1);
       }
 
       50% {
-        transform: translate(-50%, -50%) scale(1.06);
+        transform: scale(1.06);
         filter: brightness(1.12) contrast(1.12) saturate(1.2);
       }
     }
@@ -198,7 +193,7 @@
     }
 
     .hero-title {
-      font-family: 'jokerman', serif;
+      font-family: 'Cormorant Garamond', serif;
       font-size: clamp(5rem, 14vw, 11rem);
       font-weight: 300;
       line-height: 0.88;
@@ -1551,7 +1546,7 @@
       <div class="orbit"></div>
       <div class="orbit">
         <!-- Remplacer mon_iris.jpg par le nom exact de votre fichier photo -->
-        <img class="iris-photo" src="assets/images/infini_iris_nathalie.png" alt="Double Iris Infini">
+        <img class="iris-photo" src="assets/images/nathalie_iris_bd.png" alt="Iris">
       </div>
     </div>
     <div class="hero-content">
