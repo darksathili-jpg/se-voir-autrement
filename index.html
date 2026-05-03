@@ -887,6 +887,200 @@ footer {
   text-align:right;
   line-height:1.8;
 }
+
+/* ══════════════════════════════════
+   LIGHTBOX
+══════════════════════════════════ */
+.lightbox-overlay {
+  position:fixed;
+  inset:0;
+  z-index:999;
+  background:rgba(8,8,16,0.94);
+  backdrop-filter:blur(18px);
+  -webkit-backdrop-filter:blur(18px);
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  opacity:0;
+  pointer-events:none;
+  transition:opacity 0.35s ease;
+}
+.lightbox-overlay.open {
+  opacity:1;
+  pointer-events:all;
+}
+.lightbox-inner {
+  position:relative;
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  gap:1.6rem;
+  max-width:min(520px,82vw);
+  width:100%;
+  padding:1rem;
+}
+.lightbox-img-wrap {
+  width:100%;
+  aspect-ratio:1/1;
+  border-radius:50%;
+  overflow:hidden;
+  border:1px solid rgba(139,92,246,0.35);
+  box-shadow:0 0 0 1px rgba(139,92,246,0.12),0 0 70px rgba(91,45,142,0.35),0 0 140px rgba(91,45,142,0.14);
+  transform:scale(0.86);
+  transition:transform 0.45s cubic-bezier(.16,1,.3,1);
+}
+.lightbox-overlay.open .lightbox-img-wrap {
+  transform:scale(1);
+}
+.lightbox-img-wrap.placeholder-mode {
+  border-radius:16px;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  background:var(--surface);
+}
+.lightbox-img {
+  width:100%;
+  height:100%;
+  object-fit:cover;
+  display:block;
+}
+.lightbox-placeholder-inner {
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  gap:1rem;
+}
+.lp-rings {
+  position:relative;
+  width:100px;
+  height:100px;
+}
+.lp-ring {
+  position:absolute;
+  border-radius:50%;
+  border:1px solid currentColor;
+  top:50%;left:50%;
+  transform:translate(-50%,-50%);
+  opacity:0.28;
+}
+.lp-ring:nth-child(1){width:100px;height:100px;}
+.lp-ring:nth-child(2){width:64px;height:64px;}
+.lp-ring:nth-child(3){width:30px;height:30px;}
+.lightbox-placeholder-inner p {
+  font-family:'DM Mono',monospace;
+  font-size:0.62rem;
+  letter-spacing:0.16em;
+  text-transform:uppercase;
+  text-align:center;
+  line-height:1.9;
+  opacity:0.4;
+}
+.lightbox-cartel {
+  text-align:center;
+  transform:translateY(14px);
+  opacity:0;
+  transition:transform 0.4s 0.12s cubic-bezier(.16,1,.3,1),opacity 0.4s 0.12s ease;
+}
+.lightbox-overlay.open .lightbox-cartel {
+  transform:translateY(0);
+  opacity:1;
+}
+.lightbox-cartel-num {
+  font-family:'DM Mono',monospace;
+  font-size:0.58rem;
+  letter-spacing:0.28em;
+  text-transform:uppercase;
+  color:var(--iris-vif);
+  opacity:0.6;
+  margin-bottom:0.5rem;
+}
+.lightbox-cartel-name {
+  font-family:'Cormorant Garamond',serif;
+  font-size:1.8rem;
+  font-weight:600;
+  color:var(--texte);
+  margin-bottom:0.4rem;
+}
+.lightbox-cartel-desc {
+  font-family:'DM Mono',monospace;
+  font-size:0.7rem;
+  color:var(--texte-dim);
+  line-height:1.65;
+  max-width:440px;
+}
+.lightbox-dots {
+  display:flex;
+  gap:0.55rem;
+}
+.lightbox-dot {
+  width:6px;
+  height:6px;
+  border-radius:50%;
+  border:1px solid rgba(139,92,246,0.45);
+  cursor:pointer;
+  transition:background 0.2s,border-color 0.2s;
+}
+.lightbox-dot.active {
+  background:var(--iris-vif);
+  border-color:var(--iris-vif);
+}
+.lightbox-hint {
+  font-family:'DM Mono',monospace;
+  font-size:0.55rem;
+  letter-spacing:0.18em;
+  text-transform:uppercase;
+  color:var(--texte-dim);
+  opacity:0.3;
+}
+.lightbox-close {
+  position:fixed;
+  top:1.6rem;right:1.8rem;
+  width:44px;height:44px;
+  border-radius:50%;
+  border:1px solid rgba(139,92,246,0.3);
+  background:rgba(26,26,46,0.85);
+  color:var(--texte);
+  font-size:1.1rem;
+  cursor:pointer;
+  display:flex;align-items:center;justify-content:center;
+  transition:background 0.2s,border-color 0.2s,transform 0.2s;
+  z-index:10;
+  line-height:1;
+}
+.lightbox-close:hover {
+  background:rgba(139,92,246,0.2);
+  border-color:var(--iris-vif);
+  transform:scale(1.1);
+}
+.lightbox-nav {
+  position:fixed;
+  top:50%;
+  transform:translateY(-50%);
+  width:48px;height:48px;
+  border-radius:50%;
+  border:1px solid rgba(139,92,246,0.3);
+  background:rgba(26,26,46,0.85);
+  color:var(--texte);
+  font-size:1.15rem;
+  cursor:pointer;
+  display:flex;align-items:center;justify-content:center;
+  transition:background 0.2s,border-color 0.2s,transform 0.22s;
+  z-index:10;
+  line-height:1;
+}
+.lightbox-nav:hover {
+  background:rgba(139,92,246,0.2);
+  border-color:var(--iris-vif);
+}
+.lightbox-nav.prev{left:1.2rem;}
+.lightbox-nav.next{right:1.2rem;}
+.lightbox-nav.prev:hover{transform:translateY(-50%) translateX(-3px);}
+.lightbox-nav.next:hover{transform:translateY(-50%) translateX(3px);}
+@media(max-width:600px){
+  .lightbox-nav{display:none;}
+}
+.demo-card { cursor:zoom-in; }
 </style>
 </head>
 <body>
@@ -1841,8 +2035,27 @@ h1{{text-align:center;padding:2rem;font-size:3rem;}}
   </p>
 </footer>
 
+<!-- ══════════ LIGHTBOX ══════════ -->
+<div class="lightbox-overlay" id="lightbox" role="dialog" aria-modal="true" aria-label="Vue agrandie de l'iris">
+  <button class="lightbox-close" id="lb-close" aria-label="Fermer">&#x2715;</button>
+  <button class="lightbox-nav prev" id="lb-prev" aria-label="Précédent">&#x2039;</button>
+  <button class="lightbox-nav next" id="lb-next" aria-label="Suivant">&#x203a;</button>
+  <div class="lightbox-inner">
+    <div class="lightbox-img-wrap" id="lb-img-wrap">
+      <img class="lightbox-img" id="lb-img" src="" alt="">
+    </div>
+    <div class="lightbox-cartel">
+      <p class="lightbox-cartel-num" id="lb-num"></p>
+      <p class="lightbox-cartel-name" id="lb-name"></p>
+      <p class="lightbox-cartel-desc" id="lb-desc"></p>
+    </div>
+    <div class="lightbox-dots" id="lb-dots"></div>
+    <p class="lightbox-hint">← → pour naviguer &nbsp;·&nbsp; Échap pour fermer</p>
+  </div>
+</div>
+
 <script>
-// Navigation latérale — highlight au scroll
+// ── Navigation latérale — highlight au scroll ──────────────────────
 const sections = document.querySelectorAll('section[id]');
 const dots = document.querySelectorAll('.nav-dot');
 
@@ -1859,7 +2072,7 @@ const observer = new IntersectionObserver((entries) => {
 
 sections.forEach(s => observer.observe(s));
 
-// Gestion des photos démo : masquer le placeholder si l'image charge
+// ── Gestion des photos démo ────────────────────────────────────────
 document.querySelectorAll('.demo-img').forEach(img => {
   if (img.src && img.src !== window.location.href) {
     img.style.display = 'block';
@@ -1874,6 +2087,124 @@ document.querySelectorAll('.demo-img').forEach(img => {
     });
   }
 });
+
+// ── LIGHTBOX ───────────────────────────────────────────────────────
+(function() {
+  const overlay   = document.getElementById('lightbox');
+  const lbImg     = document.getElementById('lb-img');
+  const lbWrap    = document.getElementById('lb-img-wrap');
+  const lbNum     = document.getElementById('lb-num');
+  const lbName    = document.getElementById('lb-name');
+  const lbDesc    = document.getElementById('lb-desc');
+  const lbDots    = document.getElementById('lb-dots');
+  const lbClose   = document.getElementById('lb-close');
+  const lbPrev    = document.getElementById('lb-prev');
+  const lbNext    = document.getElementById('lb-next');
+
+  // Couleurs par filtre (pour les rings du placeholder lightbox)
+  const filterColors = {
+    original: '#8b5cf6',
+    gris:     '#888888',
+    negatif:  '#5cf66a',
+    cosmique: '#d4a853',
+    libre:    '#60a5fa',
+  };
+
+  // Collecter toutes les demo-cards dans l'ordre du DOM
+  const cards = Array.from(document.querySelectorAll('.demo-card'));
+  let current = 0;
+
+  // Créer les indicateurs de position
+  cards.forEach((_, i) => {
+    const dot = document.createElement('button');
+    dot.className = 'lightbox-dot';
+    dot.setAttribute('aria-label', `Image ${i + 1}`);
+    dot.addEventListener('click', () => goTo(i));
+    lbDots.appendChild(dot);
+  });
+
+  function updateDots() {
+    lbDots.querySelectorAll('.lightbox-dot').forEach((d, i) => {
+      d.classList.toggle('active', i === current);
+    });
+  }
+
+  function goTo(index) {
+    current = (index + cards.length) % cards.length;
+    populate(cards[current]);
+    updateDots();
+  }
+
+  function populate(card) {
+    const img        = card.querySelector('.demo-img');
+    const numEl      = card.querySelector('.slot-num');
+    const nameEl     = card.querySelector('.demo-cartel-name');
+    const descEl     = card.querySelector('.demo-cartel-desc');
+    const filtre     = card.dataset.filtre || 'original';
+    const color      = filterColors[filtre] || '#8b5cf6';
+
+    const hasPhoto = img && img.classList.contains('loaded');
+
+    // Mode image
+    if (hasPhoto) {
+      lbWrap.classList.remove('placeholder-mode');
+      // Vider le placeholder s'il existait
+      lbWrap.innerHTML = `<img class="lightbox-img" id="lb-img" src="${img.src}" alt="${img.alt || ''}">`;
+    } else {
+      // Mode placeholder décoratif
+      lbWrap.classList.add('placeholder-mode');
+      lbWrap.innerHTML = `
+        <div class="lightbox-placeholder-inner" style="color:${color}">
+          <div class="lp-rings">
+            <div class="lp-ring"></div>
+            <div class="lp-ring"></div>
+            <div class="lp-ring"></div>
+          </div>
+          <p>Photo à venir</p>
+        </div>`;
+    }
+
+    lbNum.textContent  = numEl  ? `Filtre ${numEl.textContent.trim()}` : '';
+    lbName.textContent = nameEl ? nameEl.textContent : '';
+    lbDesc.textContent = descEl ? descEl.textContent : '';
+  }
+
+  function openAt(index) {
+    current = index;
+    populate(cards[current]);
+    updateDots();
+    overlay.classList.add('open');
+    document.body.style.overflow = 'hidden';
+  }
+
+  function close() {
+    overlay.classList.remove('open');
+    document.body.style.overflow = '';
+  }
+
+  // Clic sur une card → ouvrir la lightbox
+  cards.forEach((card, i) => {
+    card.addEventListener('click', () => openAt(i));
+  });
+
+  // Boutons
+  lbClose.addEventListener('click', close);
+  lbPrev.addEventListener('click', (e) => { e.stopPropagation(); goTo(current - 1); });
+  lbNext.addEventListener('click', (e) => { e.stopPropagation(); goTo(current + 1); });
+
+  // Clic sur le fond → fermer
+  overlay.addEventListener('click', (e) => {
+    if (e.target === overlay) close();
+  });
+
+  // Clavier
+  document.addEventListener('keydown', (e) => {
+    if (!overlay.classList.contains('open')) return;
+    if (e.key === 'Escape')      close();
+    if (e.key === 'ArrowLeft')   goTo(current - 1);
+    if (e.key === 'ArrowRight')  goTo(current + 1);
+  });
+})();
 </script>
 </body>
 </html>
