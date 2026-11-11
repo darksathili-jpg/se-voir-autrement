@@ -1,0 +1,44 @@
+{
+  "scripts": [
+    {
+      "num": 0,
+      "pass": true,
+      "error": ""
+    },
+    {
+      "num": 1,
+      "pass": true,
+      "error": ""
+    },
+    {
+      "num": 2,
+      "pass": true,
+      "error": ""
+    },
+    {
+      "num": 3,
+      "pass": true,
+      "error": ""
+    },
+    {
+      "num": 4,
+      "pass": true,
+      "error": ""
+    }
+  ],
+  "missing_assets": [],
+  "images_unchanged": true,
+  "pdf": {
+    "pages": 1,
+    "size_points": [
+      595.3,
+      841.9
+    ]
+  },
+  "structure": {
+    "AI_inside_wrap": true,
+    "AI_before_footer": true,
+    "sections": 7,
+    "AI_cards": 3
+  }
+}
